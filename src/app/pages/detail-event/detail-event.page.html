@@ -1,0 +1,233 @@
+<ion-content fullscreen="true" class="detail-page">
+
+  <!-- HERO IMAGE -->
+
+  <div class="hero-image">
+
+    <img
+      [src]="eventImage"
+      alt="event"
+    >
+
+    <!-- TOP BAR -->
+
+    <div class="top-bar">
+
+      <!-- BACK -->
+
+      <div
+        class="circle-btn"
+        (click)="goBack()">
+
+        <ion-icon
+          name="arrow-back-outline">
+        </ion-icon>
+
+      </div>
+
+      <!-- FAVORITE -->
+
+      <div class="circle-btn" (click)="toggleSave()">
+
+        <ion-icon
+          [name]="isSaved() ? 'heart' : 'heart-outline'"
+          [class.active]="isSaved()">
+        </ion-icon>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- CONTENT -->
+
+  <div class="content-wrapper">
+
+    <!-- TITLE -->
+
+    <h1 class="event-title">
+
+      {{ eventTitle }}
+
+    </h1>
+
+    <!-- INFO -->
+
+    <div class="info-grid">
+
+      <!-- DATE -->
+
+      <div class="info-card">
+
+        <div class="info-icon">
+
+          <ion-icon
+            name="calendar-outline">
+          </ion-icon>
+
+        </div>
+
+        <div>
+
+          <span>Date & Time</span>
+
+          <h3>{{ eventDate }}</h3>
+
+        </div>
+
+      </div>
+
+      <!-- LOCATION -->
+
+      <div class="info-card">
+
+        <div class="info-icon">
+
+          <ion-icon
+            name="location-outline">
+          </ion-icon>
+
+        </div>
+
+        <div>
+
+          <span>Location</span>
+
+          <h3>{{ eventLocation }}</h3>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- TICKET AVAILABILITY SECTION -->
+    <div class="quota-section">
+      <!-- Header -->
+      <div class="quota-header">
+        <h2>Ticket Availability</h2>
+        <span class="status-badge" [ngClass]="ticketStatusColor">
+          {{ ticketStatusText }}
+        </span>
+      </div>
+
+      <!-- Overall Progress -->
+      <div class="overall-progress-container">
+        <div class="progress-info-row">
+          <span class="sold-label">Sold {{ soldTickets }} / {{ totalTickets }} Tickets</span>
+          <span class="percentage-label">{{ soldPercentage }}% Sold Out</span>
+        </div>
+        <div class="progress-bar-wrapper">
+          <div class="progress-bar-fill" [style.width.%]="soldPercentage"></div>
+        </div>
+      </div>
+
+      @if (remainingTickets === 0) {
+        <div class="sold-out-banner">
+          <ion-icon name="information-circle-outline"></ion-icon>
+          <span>All tickets have been sold</span>
+        </div>
+      }
+
+      <div class="section-divider"></div>
+
+      <!-- Ticket Category Cards -->
+      <div class="category-cards-container">
+        <div *ngFor="let cat of ticketCategories" class="category-card">
+          <div class="category-card-header">
+            <div class="category-title-icon">
+              <div class="category-icon-box">
+                <ion-icon [name]="cat.icon"></ion-icon>
+              </div>
+              <span class="category-name">{{ cat.name }}</span>
+            </div>
+            <span class="category-status-badge" [ngClass]="cat.statusColor">
+              {{ cat.statusText }}
+            </span>
+          </div>
+
+          <div class="category-stats-row">
+            <div class="category-stat-item">
+              <span class="cat-stat-lbl">Total</span>
+              <span class="cat-stat-val">{{ cat.total }}</span>
+            </div>
+            <div class="category-stat-item">
+              <span class="cat-stat-lbl">Sold</span>
+              <span class="cat-stat-val">{{ cat.sold }}</span>
+            </div>
+            <div class="category-stat-item">
+              <span class="cat-stat-lbl">Remaining</span>
+              <span class="cat-stat-val highlight" [ngClass]="cat.statusColor">{{ cat.remaining }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABOUT -->
+
+    <div class="about-section">
+
+      <h2>About Event</h2>
+
+      <p>
+        {{ eventDescription }}
+      </p>
+
+    </div>
+
+    <!-- ORGANIZER -->
+
+    <div class="organizer-section">
+
+      <img
+        src="assets/images/concert.jpg"
+        alt="organizer"
+      >
+
+      <div class="organizer-info">
+
+        <h3>
+
+          {{ eventTitle }}
+
+          <ion-icon
+            name="checkmark-circle"
+            class="verified-icon">
+          </ion-icon>
+
+        </h3>
+
+        <p>Verified Organizer</p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- BOTTOM BAR -->
+
+  <div class="bottom-bar">
+
+    <div>
+
+      <p>Starting From</p>
+
+      <h2>{{ eventPrice }}</h2>
+
+    </div>
+
+    <button
+      class="book-btn"
+      [disabled]="remainingTickets === 0"
+      (click)="goToBooking()">
+
+      Book Now
+
+    </button>
+
+  </div>
+
+</ion-content>

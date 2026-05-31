@@ -1,0 +1,153 @@
+<ion-content class="success-page">
+
+  <!-- SUCCESS ICON -->
+
+  <div class="success-icon-wrapper">
+
+    <ion-icon
+      name="checkmark-circle">
+    </ion-icon>
+
+  </div>
+
+  <!-- TITLE -->
+
+  <div class="success-title">
+
+    <h1>Payment Successful!</h1>
+
+    <p>
+      Your ticket booking has been completed successfully.
+    </p>
+
+  </div>
+
+  <!-- TICKET CARD -->
+
+  <div class="ticket-card">
+
+    <!-- TOP -->
+
+    <div class="ticket-top">
+
+      <div>
+
+        <h2>{{ eventTitle }}</h2>
+
+        <p>{{ eventCategory }}</p>
+
+      </div>
+
+      <ion-icon
+        name="ticket-outline">
+      </ion-icon>
+
+    </div>
+
+    <!-- DIVIDER -->
+
+    <div class="ticket-divider"></div>
+
+    <!-- DETAIL -->
+
+    <div class="ticket-detail">
+
+      <!-- DATE -->
+
+      <div class="detail-item">
+
+        <ion-icon
+          name="calendar-outline">
+        </ion-icon>
+
+        <div>
+
+          <span>Date</span>
+
+          <h3>{{ eventDate }}</h3>
+
+        </div>
+
+      </div>
+
+      <!-- LOCATION -->
+
+      <div class="detail-item">
+
+        <ion-icon
+          name="location-outline">
+        </ion-icon>
+
+        <div>
+
+          <span>Location</span>
+
+          <h3>{{ eventLocation }}</h3>
+
+        </div>
+
+      </div>
+
+      <!-- SEAT -->
+
+      <div class="detail-item">
+
+        <ion-icon
+          name="qr-code-outline">
+        </ion-icon>
+
+        <div>
+
+          <span>Seat</span>
+
+          <h3>{{ getSeatText() }}</h3>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- QR -->
+
+    <div class="qr-wrapper">
+
+      <img
+        src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=JOYVENT-TICKET-001"
+        alt="qr-code"
+      >
+
+    </div>
+
+    <!-- TICKET ID -->
+
+    <div class="ticket-id">
+
+      Ticket ID :
+      <strong>JYV-2026-001</strong>
+
+    </div>
+
+  </div>
+
+  <!-- BUTTON -->
+
+  <div class="button-wrapper">
+
+    <button
+      class="ticket-btn primary-btn ion-activatable ripple-parent"
+      (click)="goToMyTicket()">
+      View My Ticket
+      <ion-ripple-effect></ion-ripple-effect>
+    </button>
+
+    <button
+      class="home-btn secondary-btn ion-activatable ripple-parent"
+      (click)="goToHome()">
+      Back to Home
+      <ion-ripple-effect></ion-ripple-effect>
+    </button>
+
+  </div>
+
+</ion-content>

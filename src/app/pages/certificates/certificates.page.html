@@ -1,0 +1,93 @@
+<ion-content class="certificates-page">
+
+  <!-- HEADER GRADIENT MD3 SECTION -->
+  <div class="certificates-header">
+    <div class="header-glow-1"></div>
+    <div class="header-glow-2"></div>
+
+    <div class="header-top">
+      <button class="back-btn ion-activatable ripple-parent" (click)="goBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+        <ion-ripple-effect></ion-ripple-effect>
+      </button>
+      <div class="header-title-area">
+        <h1>Certificates</h1>
+        <p>Your completed event achievements</p>
+      </div>
+      <div class="header-icon-badge ion-activatable ripple-parent">
+        <ion-icon name="ribbon-outline"></ion-icon>
+        <ion-ripple-effect></ion-ripple-effect>
+      </div>
+    </div>
+  </div>
+
+  <!-- CERTIFICATES LIST -->
+  <div class="certificates-container">
+
+    <div class="certificates-list" *ngIf="certificates.length > 0">
+      
+      <div class="certificate-card" *ngFor="let cert of certificates">
+        
+        <!-- CARD BODY -->
+        <div class="cert-card-body">
+          <div class="cert-card-info">
+            <div class="cert-badge-row">
+              <span class="verified-badge">
+                <ion-icon name="checkmark-circle"></ion-icon>
+                <span>{{ cert.status }}</span>
+              </span>
+              <span class="cert-id">{{ cert.id }}</span>
+            </div>
+            
+            <h2 class="cert-title">{{ cert.eventTitle }}</h2>
+            <p class="cert-recipient-label">Presented to</p>
+            <h3 class="cert-recipient-name">{{ cert.participantName }}</h3>
+            
+            <div class="cert-meta-row">
+              <div class="cert-meta-item">
+                <span class="meta-label">Date</span>
+                <span class="meta-value">{{ cert.eventDate }}</span>
+              </div>
+              <div class="cert-meta-item">
+                <span class="meta-label">Organizer</span>
+                <span class="meta-value">{{ cert.organizer }}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="cert-card-qr">
+            <img [src]="cert.qrCodeUrl" alt="Verification QR" class="qr-thumbnail">
+            <span class="qr-label">Scan to verify</span>
+          </div>
+        </div>
+
+        <!-- DIVIDER & FOOTER -->
+        <div class="divider-wrapper">
+          <div class="notch left"></div>
+          <div class="notch right"></div>
+          <div class="dashed-line"></div>
+        </div>
+
+        <div class="cert-card-footer">
+          <button class="view-cert-btn ion-activatable ripple-parent" (click)="viewCertificate(cert)">
+            <span>View Certificate</span>
+            <ion-ripple-effect></ion-ripple-effect>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div class="empty-state animate-fade-in" *ngIf="certificates.length === 0">
+      <div class="empty-icon-wrapper">
+        <ion-icon name="ribbon-outline"></ion-icon>
+      </div>
+      <h2>No certificates yet</h2>
+      <p>Complete events to earn certificates</p>
+    </div>
+
+  </div>
+
+</ion-content>

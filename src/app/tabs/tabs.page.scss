@@ -1,0 +1,72 @@
+/* TAB BAR */
+
+ion-tab-bar {
+  --background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  
+  position: absolute;
+  bottom: 24px;
+  left: 20px;
+  right: 20px;
+  height: 76px;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 16px 36px rgba(79, 99, 255, 0.12), 
+              0 4px 12px rgba(0, 0, 0, 0.04);
+  padding: 0 8px 4px;
+  z-index: 1000;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* TAB BUTTON */
+
+ion-tab-button {
+  --color: #9ca3af;
+  --color-selected: #4f63ff;
+  background: transparent;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  transition: all 0.2s ease;
+  
+  &::part(native) {
+    background: transparent;
+  }
+}
+
+/* ACTIVE TAB */
+
+ion-tab-button.tab-selected {
+  color: #4f63ff;
+  
+  ion-icon {
+    transform: translateY(-2px) scale(1.15);
+    filter: drop-shadow(0 4px 10px rgba(79, 99, 255, 0.35));
+    color: #4f63ff;
+  }
+  
+  ion-label {
+    color: #4f63ff;
+    font-weight: 700;
+  }
+}
+
+/* ICON */
+
+ion-icon {
+  font-size: 24px;
+  margin-bottom: 2px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+ion-tabs {
+  position: relative;
+  height: 100%;
+}
+
+ion-router-outlet {
+  z-index: 1;
+  height: 100%;
+}

@@ -1,0 +1,293 @@
+<ion-content class="ticket-page">
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="custom-toast" *ngIf="toastVisible">
+    <ion-icon name="checkmark-circle"></ion-icon>
+    <span>{{ toastMessage }}</span>
+  </div>
+
+  <!-- HEADER -->
+  <div class="ticket-header">
+    <div class="header-glow-1"></div>
+    <div class="header-glow-2"></div>
+    
+    <div class="header-top">
+      <div class="circle-btn ion-activatable ripple-parent" (click)="goBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+        <ion-ripple-effect></ion-ripple-effect>
+      </div>
+    </div>
+
+    <div class="header-title-container">
+      <h2>My Ticket</h2>
+      <p>View and manage your booked event tickets</p>
+    </div>
+  </div>
+
+  <!-- TICKET CARD -->
+  <div class="ticket-card">
+
+    <!-- EVENT IMAGE -->
+    <img [src]="eventImage" alt="event">
+
+    <!-- CATEGORY -->
+    <div class="ticket-category">
+      {{ eventCategory }}
+    </div>
+
+    <!-- CONTENT -->
+    <div class="ticket-content">
+
+      <!-- EVENT TITLE -->
+      <h1>{{ eventTitle }}</h1>
+
+      <!-- INFO ROWS -->
+      <div class="ticket-info">
+        <div class="info-item">
+          <span>Date</span>
+          <h3>{{ eventDate }}</h3>
+        </div>
+        <div class="info-item">
+          <span>Time</span>
+          <h3>{{ eventTime }}</h3>
+        </div>
+      </div>
+
+      <div class="ticket-info">
+        <div class="info-item">
+          <span>Location</span>
+          <h3>{{ eventLocation }}</h3>
+        </div>
+        <div class="info-item">
+          <span>Payment</span>
+          <h3>{{ paymentMethod }}</h3>
+        </div>
+      </div>
+
+      <div class="ticket-info">
+        <div class="info-item" *ngFor="let item of purchasedTickets">
+          <span>{{ item.name }}</span>
+          <h3>{{ item.qty }}</h3>
+        </div>
+      </div>
+
+      <!-- DIVIDER -->
+      <div class="divider"></div>
+
+      <!-- TICKET HOLDER -->
+      <div class="user-section">
+        <span>Ticket Holder</span>
+        <h2>{{ fullName }}</h2>
+      </div>
+
+      <!-- SEAT -->
+      <div class="user-section" *ngIf="selectedSeats && selectedSeats.length > 0">
+        <span>Selected Seat</span>
+        <h2>
+          <span *ngFor="let seat of selectedSeats">
+            {{ seat }}
+          </span>
+        </h2>
+      </div>
+
+      <!-- TOTAL -->
+      <div class="user-section">
+        <span>Total Payment</span>
+        <h2>Rp{{ totalPrice.toLocaleString('id-ID') }}</h2>
+      </div>
+
+      <!-- QR SECTION -->
+      <div class="qr-section">
+        <div class="qr-wrapper">
+          <img
+            src="assets/images/qr-code.png"
+            alt="qr"
+            [class.blurred]="status === 'Refund Requested' || status === 'Refunded'"
+          >
+          
+          <!-- BLUR OVERLAY FOR QR IF REFUNDED / REFUND IN PROGRESS -->
+          <div 
+            class="qr-blur-overlay" 
+            *ngIf="status === 'Refund Requested' || status === 'Refunded'"
+            [ngClass]="status.toLowerCase().replace(' ', '-')"
+          >
+            <ion-icon name="time-outline" *ngIf="status === 'Refund Requested'"></ion-icon>
+            <ion-icon name="lock-closed-outline" *ngIf="status === 'Refunded'"></ion-icon>
+            <span>{{ status === 'Refund Requested' ? 'Refund In Process' : 'Refunded' }}</span>
+          </div>
+        </div>
+
+        <p>ID: {{ bookingId || 'JV-2026-92831' }}</p>
+      </div>
+
+      <!-- SIMULATE SCAN BUTTON (Always visible for demonstration) -->
+      <div class="scanner-sim-action" *ngIf="status !== 'Unpaid' && status !== 'Canceled'">
+        <button class="scanner-sim-btn ion-activatable ripple-parent" (click)="openScannerSim()">
+          <ion-icon name="qr-code-outline"></ion-icon>
+          <span>Simulate Gate Scan</span>
+          <ion-ripple-effect></ion-ripple-effect>
+        </button>
+      </div>
+
+      <!-- REFUND BUTTON -->
+      <div class="refund-action-container" *ngIf="status === 'Upcoming'">
+        <button class="refund-btn ion-activatable ripple-parent" (click)="openRefundModal()">
+          <ion-icon name="arrow-undo-outline"></ion-icon>
+          <span>Request Refund</span>
+          <ion-ripple-effect></ion-ripple-effect>
+        </button>
+      </div>
+
+      <!-- REFUND TIMELINE -->
+      <div class="refund-timeline-card" *ngIf="status === 'Refund Requested' || status === 'Refunded'">
+        <h4>Refund Timeline</h4>
+        <div class="timeline-steps">
+          <div class="timeline-step active">
+            <div class="step-icon-wrapper">
+              <ion-icon name="checkmark-circle"></ion-icon>
+            </div>
+            <div class="step-details">
+              <h5>Refund Requested</h5>
+              <p>{{ (refundRequestedAt > 0 ? refundRequestedAt : Date.now()) | date:'dd MMM yyyy, HH:mm' }} WIB</p>
+              <span class="reason-tag">Reason: {{ refundReason || 'No reason provided' }}</span>
+            </div>
+          </div>
+          
+          <div class="timeline-connector" [class.active]="status === 'Refunded'"></div>
+          
+          <div class="timeline-step" [class.active]="status === 'Refunded'">
+            <div class="step-icon-wrapper">
+              <ion-icon name="checkmark-circle" *ngIf="status === 'Refunded'"></ion-icon>
+              <div class="step-dot" *ngIf="status !== 'Refunded'"></div>
+            </div>
+            <div class="step-details">
+              <h5>{{ status === 'Refunded' ? 'Refunded (Approved)' : 'Processing Refund' }}</h5>
+              <p *ngIf="status === 'Refunded'">Refund has been credited back to your payment method.</p>
+              <p *ngIf="status !== 'Refunded'">Organizer is verifying your request.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN SIMULATION PANEL -->
+      <div class="admin-sim-panel" *ngIf="status === 'Refund Requested'">
+        <div class="panel-header">
+          <ion-icon name="construct-outline"></ion-icon>
+          <span>Admin Simulation Mode</span>
+        </div>
+        <p>Simulate organizer verifying and approving this refund request:</p>
+        <button class="approve-refund-btn ion-activatable ripple-parent" (click)="simulateApproveRefund()">
+          <span>Approve & Issue Refund</span>
+          <ion-ripple-effect></ion-ripple-effect>
+        </button>
+      </div>
+
+      <!-- STATUS BADGE -->
+      <div class="status-badge" [ngClass]="status.toLowerCase().replace(' ', '-')">
+        {{ status }}
+      </div>
+
+    </div>
+  </div>
+
+  <!-- REFUND BOTTOM SHEET MODAL -->
+  <div class="bottom-sheet-backdrop" *ngIf="showModal" (click)="closeRefundModal()"></div>
+  <div class="bottom-sheet-modal" [class.show]="showModal">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3>Refund Request</h3>
+      <p>Are you sure you want to request a refund for this ticket?</p>
+    </div>
+    
+    <div class="sheet-content">
+      <label class="reason-label">Select Reason:</label>
+      <div class="reasons-list">
+        <div 
+          *ngFor="let reason of refundReasons" 
+          class="reason-item" 
+          (click)="selectReason(reason)"
+        >
+          <div class="radio-outer" [class.selected]="selectedReason === reason">
+            <div class="radio-inner" *ngIf="selectedReason === reason"></div>
+          </div>
+          <span>{{ reason }}</span>
+        </div>
+      </div>
+      
+      <div class="other-reason-input" *ngIf="selectedReason === 'Other'">
+        <textarea 
+          placeholder="Tell us more about your reason..." 
+          [(ngModel)]="customReason"
+        ></textarea>
+      </div>
+    </div>
+    
+    <div class="sheet-actions">
+      <button class="cancel-sheet-btn ion-activatable ripple-parent" (click)="closeRefundModal()">
+        <span>Cancel</span>
+        <ion-ripple-effect></ion-ripple-effect>
+      </button>
+      <button 
+        class="confirm-sheet-btn ion-activatable ripple-parent" 
+        [disabled]="!selectedReason" 
+        (click)="submitRefund()"
+      >
+        <span>Confirm Refund</span>
+        <ion-ripple-effect></ion-ripple-effect>
+      </button>
+    </div>
+  </div>
+
+  <!-- GATE SCAN VERIFICATION SIMULATOR MODAL -->
+  <div class="bottom-sheet-backdrop" *ngIf="showScannerSim" (click)="closeScannerSim()"></div>
+  <div class="bottom-sheet-modal scanner-sim-sheet" [class.show]="showScannerSim">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3>Gate Scanner Simulator</h3>
+      <p>Simulates organizer scanning this ticket's QR code at event entrance.</p>
+    </div>
+    
+    <div class="sheet-content scanner-result-area">
+      <!-- VALID STATE -->
+      <div class="scanner-result valid-state" *ngIf="status === 'Upcoming' || status === 'Completed'">
+        <div class="result-icon-wrapper success-icon">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+        </div>
+        <h4>Ticket Valid</h4>
+        <span class="status-sub">CHECK-IN SUCCESSFUL</span>
+        
+        <div class="result-details-card">
+          <div class="detail-line"><span>Event</span><strong>{{ eventTitle }}</strong></div>
+          <div class="detail-line"><span>Holder</span><strong>{{ fullName }}</strong></div>
+          <div class="detail-line"><span>Seats</span><strong>{{ selectedSeats.join(', ') }}</strong></div>
+        </div>
+      </div>
+      
+      <!-- INVALID STATE (Refund Requested or Refunded) -->
+      <div class="scanner-result invalid-state" *ngIf="status === 'Refund Requested' || status === 'Refunded'">
+        <div class="result-icon-wrapper error-icon">
+          <ion-icon name="close-circle-outline"></ion-icon>
+        </div>
+        <h4 class="text-red">Ticket Invalid</h4>
+        <span class="status-sub text-red">{{ status === 'Refunded' ? 'REFUNDED TICKET' : 'REFUND IN PROGRESS' }}</span>
+        
+        <p class="error-msg">
+          This ticket has been cancelled due to a refund request. Check-in is blocked.
+        </p>
+
+        <div class="result-details-card error-details">
+          <div class="detail-line"><span>Status</span><strong>{{ status }}</strong></div>
+          <div class="detail-line" *ngIf="refundReason"><span>Reason</span><strong>{{ refundReason }}</strong></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="sheet-actions">
+      <button class="cancel-sheet-btn ion-activatable ripple-parent" (click)="closeScannerSim()" style="width: 100%">
+        <span>Close Simulator</span>
+        <ion-ripple-effect></ion-ripple-effect>
+      </button>
+    </div>
+  </div>
+
+</ion-content>

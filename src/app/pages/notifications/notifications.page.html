@@ -1,0 +1,103 @@
+<ion-content class="notifications-page">
+
+  <!-- HEADER -->
+  <div class="notifications-header">
+    <div class="header-glow-1"></div>
+    <div class="header-glow-2"></div>
+    
+    <button class="back-btn ion-activatable ripple-parent" (click)="goBack()">
+      <ion-icon name="arrow-back-outline"></ion-icon>
+      <ion-ripple-effect></ion-ripple-effect>
+    </button>
+    
+    <div class="header-titles">
+      <h1>Notifications</h1>
+      <p>Stay updated with your events</p>
+    </div>
+  </div>
+
+  <!-- ACTION BUTTONS -->
+  <div class="action-bar" *ngIf="notifications.length > 0">
+    <button class="action-btn text-blue ion-activatable ripple-parent" (click)="markAllAsRead()">
+      <ion-icon name="checkmark-circle-outline"></ion-icon>
+      <span>Mark all as read</span>
+      <ion-ripple-effect></ion-ripple-effect>
+    </button>
+    
+    <button class="action-btn text-red ion-activatable ripple-parent" (click)="clearAll()">
+      <ion-icon name="trash-outline"></ion-icon>
+      <span>Clear all</span>
+      <ion-ripple-effect></ion-ripple-effect>
+    </button>
+  </div>
+
+  <!-- FILTER TABS -->
+  <div class="filter-tabs-container">
+    <div class="filter-tabs">
+      <button
+        class="filter-tab"
+        [class.active]="selectedFilter === 'All'"
+        (click)="setFilter('All')">
+        All
+      </button>
+      <button
+        class="filter-tab"
+        [class.active]="selectedFilter === 'Unread'"
+        (click)="setFilter('Unread')">
+        Unread
+      </button>
+      <button
+        class="filter-tab"
+        [class.active]="selectedFilter === 'Payment'"
+        (click)="setFilter('Payment')">
+        Payment
+      </button>
+      <button
+        class="filter-tab"
+        [class.active]="selectedFilter === 'Events'"
+        (click)="setFilter('Events')">
+        Events
+      </button>
+    </div>
+  </div>
+
+  <!-- NOTIFICATION LIST -->
+  <div class="notification-list" *ngIf="getFilteredNotifications().length > 0">
+    <div
+      *ngFor="let item of getFilteredNotifications()"
+      class="notification-card ion-activatable ripple-parent"
+      [class.unread]="item.unread"
+      (click)="markAsRead(item)">
+      
+      <div class="card-left">
+        <div class="category-icon-wrapper" [class]="item.iconBg">
+          <ion-icon [name]="item.icon"></ion-icon>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="card-header">
+          <h3>{{ item.title }}</h3>
+          <span class="timestamp">{{ item.time }}</span>
+        </div>
+        <p>{{ item.description }}</p>
+      </div>
+
+      <div class="card-right" *ngIf="item.unread">
+        <div class="unread-dot"></div>
+      </div>
+
+      <ion-ripple-effect></ion-ripple-effect>
+    </div>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div class="empty-state" *ngIf="getFilteredNotifications().length === 0">
+    <div class="empty-icon-wrapper">
+      <ion-icon name="notifications-outline"></ion-icon>
+    </div>
+    <h2>No notifications yet</h2>
+    <p>Your latest event updates will appear here</p>
+  </div>
+
+</ion-content>

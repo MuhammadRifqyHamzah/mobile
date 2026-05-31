@@ -1,0 +1,143 @@
+<ion-content class="about-app-page">
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="custom-toast" *ngIf="toastVisible">
+    <ion-icon name="checkmark-circle"></ion-icon>
+    <span>{{ toastMessage }}</span>
+  </div>
+
+  <!-- HEADER GRADIENT SECTION -->
+  <div class="about-header animate-fade-in">
+    <div class="header-glow-1"></div>
+    <div class="header-glow-2"></div>
+    
+    <button class="back-btn ion-activatable ripple-parent" (click)="goBack()">
+      <ion-icon name="arrow-back-outline"></ion-icon>
+      <ion-ripple-effect></ion-ripple-effect>
+    </button>
+    
+    <div class="header-content">
+      <!-- Modern CSS Logo Badge -->
+      <div class="logo-wrapper">
+        <div class="logo-orb"></div>
+        <ion-icon name="ticket-outline" class="logo-icon"></ion-icon>
+      </div>
+      
+      <h1 class="app-name">JoyVent</h1>
+      <p class="app-slogan">Bring Joy to Every Event</p>
+    </div>
+  </div>
+
+  <div class="page-content animate-slide-up">
+
+    <!-- ABOUT APP SECTION -->
+    <div class="about-card card-premium">
+      <div class="card-glow"></div>
+      <div class="about-card-header">
+        <ion-icon name="ticket-outline" class="about-icon"></ion-icon>
+        <h3>About JoyVent</h3>
+      </div>
+      <p class="about-description">
+        JoyVent is a modern event management and ticket booking platform designed to help users discover, book, and manage events easily and securely.
+      </p>
+      
+      <!-- Modern Event Illustration Badge (CSS shapes) -->
+      <div class="illustration-badge">
+        <div class="circle-ill-1"></div>
+        <div class="circle-ill-2"></div>
+        <div class="badge-content">
+          <ion-icon name="calendar-outline"></ion-icon>
+          <span>100% Student Final Project Vibe</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- FEATURES SECTION -->
+    <div class="section-container">
+      <h4 class="section-title">Key Features</h4>
+      
+      <div class="features-grid">
+        <div 
+          *ngFor="let item of features" 
+          class="feature-card ion-activatable ripple-parent"
+        >
+          <div class="feature-icon-wrapper">
+            <ion-icon [name]="item.icon"></ion-icon>
+          </div>
+          <div class="feature-info">
+            <h5>{{ item.title }}</h5>
+            <p>{{ item.desc }}</p>
+          </div>
+          <ion-ripple-effect></ion-ripple-effect>
+        </div>
+      </div>
+    </div>
+
+    <!-- APP STATISTICS SECTION -->
+    <div class="section-container">
+      <h4 class="section-title">App Statistics</h4>
+      
+      <div class="stats-grid">
+        <div *ngFor="let item of stats" class="stat-card">
+          <div class="stat-icon-wrapper">
+            <ion-icon [name]="item.icon"></ion-icon>
+          </div>
+          <h3 class="stat-value">{{ item.value }}</h3>
+          <p class="stat-label">{{ item.label }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEVELOPER SECTION -->
+    <div class="developer-card card-premium">
+      <div class="card-glow dev-glow"></div>
+      <div class="developer-header">
+        <div class="dev-icon-wrapper">
+          <ion-icon name="code-slash-outline"></ion-icon>
+        </div>
+        <div class="dev-titles">
+          <span>Developed By</span>
+          <h3>Team Project26Dev</h3>
+        </div>
+      </div>
+      
+      <div class="dev-details-list">
+        <div class="dev-detail-item">
+          <span class="bullet">•</span>
+          <p>Event Management Final Project</p>
+        </div>
+        <div class="dev-detail-item">
+          <span class="bullet">•</span>
+          <p>Mobile & Web Event System</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SOCIAL LINKS -->
+    <div class="social-container">
+      <button class="social-btn instagram ion-activatable ripple-parent" (click)="socialClick()">
+        <ion-icon name="logo-instagram"></ion-icon>
+        <ion-ripple-effect></ion-ripple-effect>
+      </button>
+      
+      <button class="social-btn email ion-activatable ripple-parent" (click)="socialClick()">
+        <ion-icon name="mail-outline"></ion-icon>
+        <ion-ripple-effect></ion-ripple-effect>
+      </button>
+      
+      <button class="social-btn github ion-activatable ripple-parent" (click)="socialClick()">
+        <ion-icon name="logo-github"></ion-icon>
+        <ion-ripple-effect></ion-ripple-effect>
+      </button>
+    </div>
+
+    <!-- APP VERSION SECTION -->
+    <div class="version-section">
+      <p class="v-num">JoyVent v1.0.0</p>
+      <p class="v-copyright">© 2026 JoyVent</p>
+      <p class="v-made">Made with ❤️ in Indonesia</p>
+    </div>
+
+  </div>
+
+</ion-content>

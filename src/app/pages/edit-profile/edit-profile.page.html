@@ -1,0 +1,124 @@
+<ion-content class="edit-profile-page">
+
+  <!-- TOAST NOTIFICATION FOR SUCCESS SAVE -->
+  <div class="custom-toast" *ngIf="savedSuccess">
+    <ion-icon name="checkmark-circle"></ion-icon>
+    <span>Profil berhasil diperbarui!</span>
+  </div>
+
+  <!-- HEADER -->
+  <div class="edit-profile-header">
+    <div class="header-glow-1"></div>
+    <div class="header-glow-2"></div>
+    
+    <button class="back-btn ion-activatable ripple-parent" (click)="goBack()">
+      <ion-icon name="arrow-back-outline"></ion-icon>
+      <ion-ripple-effect></ion-ripple-effect>
+    </button>
+    
+    <div class="header-titles">
+      <h1>Edit Profile</h1>
+      <p>Manage your personal information</p>
+    </div>
+  </div>
+
+  <!-- PROFILE PHOTO SECTION -->
+  <div class="profile-photo-section">
+    <div class="avatar-wrapper">
+      <img [src]="avatar" alt="Avatar">
+      <button class="camera-btn ion-activatable ripple-parent">
+        <ion-icon name="camera-outline"></ion-icon>
+        <ion-ripple-effect></ion-ripple-effect>
+      </button>
+    </div>
+    <span class="change-photo-text">Change Profile Photo</span>
+  </div>
+
+  <!-- PERSONAL INFORMATION FORM CARD -->
+  <div class="form-card">
+    
+    <!-- FULL NAME -->
+    <div class="form-group">
+      <div class="input-box">
+        <ion-icon name="person-outline" class="input-icon"></ion-icon>
+        <input
+          type="text"
+          [(ngModel)]="fullName"
+          placeholder=" "
+          required
+        >
+        <label>Full Name</label>
+      </div>
+    </div>
+
+    <!-- EMAIL -->
+    <div class="form-group">
+      <div class="input-box">
+        <ion-icon name="mail-outline" class="input-icon"></ion-icon>
+        <input
+          type="email"
+          [(ngModel)]="email"
+          placeholder=" "
+          required
+        >
+        <label>Email Address</label>
+      </div>
+    </div>
+
+    <!-- PHONE NUMBER -->
+    <div class="form-group">
+      <div class="input-box">
+        <ion-icon name="call-outline" class="input-icon"></ion-icon>
+        <input
+          type="text"
+          [(ngModel)]="phone"
+          placeholder=" "
+          required
+        >
+        <label>Phone Number</label>
+      </div>
+    </div>
+
+    <!-- LOCATION -->
+    <div class="form-group">
+      <div class="input-box">
+        <ion-icon name="location-outline" class="input-icon"></ion-icon>
+        <input
+          type="text"
+          [(ngModel)]="location"
+          placeholder=" "
+          required
+        >
+        <label>City / Location</label>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ACCOUNT SECURITY SECTION -->
+  <h3 class="security-title">Account Security</h3>
+  <div class="security-card">
+    <div class="security-item ion-activatable ripple-parent" (click)="changePassword()">
+      <div class="security-left">
+        <div class="security-icon-wrapper">
+          <ion-icon name="lock-closed-outline"></ion-icon>
+        </div>
+        <div class="security-details">
+          <h4>Change Password</h4>
+          <p>Update your account password</p>
+        </div>
+      </div>
+      <ion-icon name="chevron-forward-outline" class="security-arrow"></ion-icon>
+      <ion-ripple-effect></ion-ripple-effect>
+    </div>
+  </div>
+
+  <!-- SAVE CHANGES ACTION BUTTON -->
+  <div class="action-wrapper">
+    <button class="save-btn primary-btn ion-activatable ripple-parent" (click)="saveChanges()">
+      <span>Save Changes</span>
+      <ion-ripple-effect></ion-ripple-effect>
+    </button>
+  </div>
+
+</ion-content>

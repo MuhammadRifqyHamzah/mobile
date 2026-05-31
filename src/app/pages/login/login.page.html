@@ -1,0 +1,105 @@
+<ion-content fullscreen="true" class="login-page">
+
+  <!-- HEADER -->
+  <div class="auth-header">
+    <h2>Log in Page</h2>
+  </div>
+
+  <!-- BODY -->
+  <div class="auth-body">
+
+    <!-- LOGO IMAGE -->
+    <div class="logo-img-wrapper">
+      <img src="assets/images/Logo-JoyVent.jpg" class="app-logo-img" alt="JoyVent Logo">
+    </div>
+
+    <!-- TITLE -->
+    <h1 class="auth-title">
+      Welcome Back!
+    </h1>
+
+    <p class="auth-subtitle">
+      Log in to manage your event tickets
+    </p>
+
+    <!-- EMAIL -->
+    <div class="form-group">
+
+      <label class="form-label uppercase">
+        EMAIL
+      </label>
+
+      <div class="input-wrap">
+
+        <ion-icon name="mail-outline"></ion-icon>
+
+        <input
+          type="email"
+          placeholder="abcd@gmail.com">
+
+      </div>
+
+    </div>
+
+    <!-- PASSWORD -->
+    <div class="form-group">
+
+      <label class="form-label">
+        Password
+      </label>
+
+      <div class="input-wrap">
+
+        <ion-icon name="lock-closed-outline"></ion-icon>
+
+        <input
+          type="password"
+          placeholder="••••••••••">
+
+        <ion-icon
+          name="eye-outline">
+        </ion-icon>
+
+      </div>
+
+      <a class="forgot-link">
+        Forgot Password?
+      </a>
+
+    </div>
+
+    <!-- LOGIN -->
+    <button class="btn-primary" (click)="login()">
+      Log in
+    </button>
+
+    <!-- DIVIDER -->
+    <div class="divider">
+      or
+    </div>
+
+    <!-- GOOGLE -->
+    <button class="btn-google">
+
+      <img
+        src="https://www.svgrepo.com/show/475656/google-color.svg"
+        class="google-icon">
+
+      Log in with Google
+
+    </button>
+
+    <!-- FOOTER -->
+    <p class="auth-footer">
+
+      Don't have an account?
+
+      <a routerLink="/register">
+        Sign up now
+      </a>
+
+    </p>
+
+  </div>
+
+</ion-content>

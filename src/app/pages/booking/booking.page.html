@@ -1,0 +1,364 @@
+<ion-content class="booking-page">
+
+  <!-- HEADER -->
+  <div class="booking-header">
+    <div class="header-glow-1"></div>
+    <div class="header-glow-2"></div>
+    
+    <button class="back-btn ion-activatable ripple-parent" (click)="onBackClick()">
+      <ion-icon name="arrow-back-outline"></ion-icon>
+      <ion-ripple-effect></ion-ripple-effect>
+    </button>
+    
+    <h1>Book Ticket</h1>
+  </div>
+
+  <!-- EVENT CARD -->
+  <div class="mini-event-card">
+    <div class="image-wrapper">
+      <img [src]="eventImage" alt="event">
+      <div class="image-overlay"></div>
+    </div>
+    <div class="mini-event-content">
+      <h2>{{ eventTitle }}</h2>
+      <div class="event-meta">
+        <span class="location">📍 {{ eventLocation }}</span>
+        <span class="date">📅 {{ eventDate }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP PROGRESS TRACKER -->
+  <div class="booking-stepper">
+    <div class="stepper-track">
+      <div class="stepper-progress" [style.width.%]="getStepProgress()"></div>
+    </div>
+    
+    @for (step of getStepperSteps(); track step.id; let idx = $index) {
+      <div class="stepper-step" [class.active]="stepsIndex >= idx" [class.completed]="stepsIndex > idx">
+        <div class="step-circle">
+          <span *ngIf="stepsIndex <= idx">{{ idx + 1 }}</span>
+          <ion-icon *ngIf="stepsIndex > idx" name="checkmark-circle"></ion-icon>
+        </div>
+        <span class="step-label">{{ step.label }}</span>
+      </div>
+    }
+  </div>
+
+  <!-- STEP 1: BIODATA -->
+  <div *ngIf="currentStep === 1" class="step-content animate-fade">
+    <div class="section-header">
+      <h2>Complete Your Biodata</h2>
+      <p>Please enter your contact details for ticket updates and delivery</p>
+    </div>
+
+    <div class="form-container">
+      <div class="form-group">
+        <label>Full Name</label>
+        <div class="input-box">
+          <ion-icon name="person-outline"></ion-icon>
+          <input
+            type="text"
+            placeholder="Masukkan nama lengkap"
+            [(ngModel)]="fullName"
+          >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Email Address</label>
+        <div class="input-box">
+          <ion-icon name="mail-outline"></ion-icon>
+          <input
+            type="email"
+            placeholder="example@gmail.com"
+            [(ngModel)]="email"
+          >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Phone Number</label>
+        <div class="input-box">
+          <ion-icon name="call-outline"></ion-icon>
+          <input
+            type="text"
+            placeholder="08xxxxxxxx"
+            [(ngModel)]="phone"
+          >
+        </div>
+      </div>
+    </div>
+
+    <button
+      class="next-btn primary-btn ion-activatable ripple-parent"
+      (click)="nextStep()">
+      Next Step
+      <ion-ripple-effect></ion-ripple-effect>
+    </button>
+  </div>
+
+  <!-- STEP 2: CHOOSE TICKET -->
+  <div *ngIf="currentStep === 2" class="step-content animate-fade">
+    <div class="section-header">
+      <h2>Choose Ticket</h2>
+      <p>Select the ticket quantity for each category</p>
+    </div>
+
+    <div class="ticket-category-list">
+      @for (cat of event?.ticketCategories; track cat.id) {
+        <div class="ticket-category-card" [class.active]="(ticketQuantities[cat.id] || 0) > 0">
+          <div class="card-details">
+            <div class="badge" [ngClass]="cat.id">{{ cat.name }}</div>
+            <h3>{{ cat.name }}</h3>
+            <span class="price-label">Rp{{ cat.price.toLocaleString('id-ID') }}</span>
+          </div>
+          <div class="ticket-qty-control">
+            <button class="qty-btn" (click)="decreaseQty(cat.id)" [disabled]="(ticketQuantities[cat.id] || 0) === 0">-</button>
+            <span class="qty-val">{{ ticketQuantities[cat.id] || 0 }}</span>
+            <button class="qty-btn" (click)="increaseQty(cat.id)">+</button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="step-button-group">
+      <button
+        class="secondary-btn ion-activatable ripple-parent"
+        (click)="prevStep()">
+        Back
+        <ion-ripple-effect></ion-ripple-effect>
+      </button>
+      <button
+        class="next-btn primary-btn ion-activatable ripple-parent"
+        (click)="nextStep()">
+        Next
+        <ion-ripple-effect></ion-ripple-effect>
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 3: CHOOSE SEAT -->
+  <div *ngIf="currentStep === 3" class="step-content animate-fade">
+    <div class="section-header">
+      <h2>Select Your Seat</h2>
+      <p>Tap on the seats to select your preferred positions</p>
+    </div>
+
+    <!-- LEGEND -->
+    <div class="seat-legend">
+      <div class="legend-item">
+        <div class="seat-sample available"></div>
+        <span>Available</span>
+      </div>
+      <div class="legend-item">
+        <div class="seat-sample selected"></div>
+        <span>Selected</span>
+      </div>
+      <div class="legend-item">
+        <div class="seat-sample booked"></div>
+        <span>Booked</span>
+      </div>
+    </div>
+
+    <!-- SEAT LAYOUT -->
+    <div class="seat-layout">
+      <!-- VIP -->
+      <div class="seat-section">
+        <h3>VIP SECTION</h3>
+        <div
+          class="seat-row"
+          *ngFor="let row of vipSeats">
+          <button
+            *ngFor="let seat of row"
+            class="seat-btn"
+            [class.selected]="isSelected(seat)"
+            [class.booked]="isBooked(seat)"
+            [disabled]="isBooked(seat)"
+            (click)="toggleSeat(seat)">
+            {{ seat }}
+          </button>
+        </div>
+      </div>
+
+      <!-- REGULAR -->
+      <div class="seat-section">
+        <h3>REGULAR SECTION</h3>
+        <div
+          class="seat-row"
+          *ngFor="let row of regularSeats">
+          <button
+            *ngFor="let seat of row"
+            class="seat-btn"
+            [class.selected]="isSelected(seat)"
+            [class.booked]="isBooked(seat)"
+            [disabled]="isBooked(seat)"
+            (click)="toggleSeat(seat)">
+            {{ seat }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SELECTED INFO -->
+    <div class="selected-seat-info" *ngIf="selectedSeats.length > 0">
+      <h3>Selected Seats ({{ selectedSeats.length }})</h3>
+      <div class="selected-seats-container">
+        <span class="seat-tag" *ngFor="let seat of selectedSeats">
+          {{ seat }}
+        </span>
+      </div>
+    </div>
+
+    <div class="step-button-group">
+      <button
+        class="secondary-btn ion-activatable ripple-parent"
+        (click)="prevStep()">
+        Back
+        <ion-ripple-effect></ion-ripple-effect>
+      </button>
+      <button
+        class="next-btn primary-btn ion-activatable ripple-parent"
+        (click)="nextStep()">
+        Continue
+        <ion-ripple-effect></ion-ripple-effect>
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 4: PAYMENT SUMMARY -->
+  <div *ngIf="currentStep === 4" class="step-content animate-fade">
+    <div class="section-header">
+      <h2>Payment Summary</h2>
+      <p>Review details and confirm payment method</p>
+    </div>
+
+    <!-- ORDER SUMMARY CARD -->
+    <div class="summary-card">
+      <h3>Order Details</h3>
+      
+      @for (cat of event?.ticketCategories; track cat.id) {
+        @if ((ticketQuantities[cat.id] || 0) > 0) {
+          <div class="summary-item">
+            <span>{{ cat.name }} ({{ ticketQuantities[cat.id] }}x)</span>
+            <strong>Rp{{ (ticketQuantities[cat.id] * cat.price).toLocaleString('id-ID') }}</strong>
+          </div>
+        }
+      }
+      
+      <div class="summary-item" *ngIf="selectedSeats.length > 0">
+        <span>Seats Selected</span>
+        <strong class="seats-summary-list">
+          <span class="seat-summary-tag" *ngFor="let seat of selectedSeats">
+            {{ seat }}
+          </span>
+        </strong>
+      </div>
+      
+      <div class="summary-total">
+        <span>Total Amount</span>
+        <h2>Rp{{ getTotalPrice().toLocaleString('id-ID') }}</h2>
+      </div>
+    </div>
+
+    <!-- SELECT PAYMENT METHOD -->
+    <div class="payment-method-section">
+      <h3 class="section-subtitle">Select Payment Method</h3>
+      
+      <div class="payment-method-list">
+        <!-- BANK TRANSFER -->
+        <button
+          class="payment-method-card"
+          [class.active]="selectedPayment === 'Bank Transfer'"
+          (click)="selectPayment('Bank Transfer')">
+          <div class="payment-icon-wrapper">
+            <ion-icon name="business-outline"></ion-icon>
+          </div>
+          <div class="payment-details">
+            <h4>Transfer Bank</h4>
+            <p>BCA, Mandiri, BNI, BRI, dll.</p>
+          </div>
+          <div class="payment-check-wrapper">
+            <div class="radio-indicator">
+              <div class="inner-dot" *ngIf="selectedPayment === 'Bank Transfer'"></div>
+            </div>
+          </div>
+        </button>
+
+        <!-- E-WALLET -->
+        <button
+          class="payment-method-card"
+          [class.active]="selectedPayment === 'E-Wallet'"
+          (click)="selectPayment('E-Wallet')">
+          <div class="payment-icon-wrapper">
+            <ion-icon name="wallet-outline"></ion-icon>
+          </div>
+          <div class="payment-details">
+            <h4>E-Wallet</h4>
+            <p>GoPay, OVO, Dana, LinkAja</p>
+          </div>
+          <div class="payment-check-wrapper">
+            <div class="radio-indicator">
+              <div class="inner-dot" *ngIf="selectedPayment === 'E-Wallet'"></div>
+            </div>
+          </div>
+        </button>
+
+        <!-- QRIS -->
+        <button
+          class="payment-method-card"
+          [class.active]="selectedPayment === 'QRIS'"
+          (click)="selectPayment('QRIS')">
+          <div class="payment-icon-wrapper">
+            <ion-icon name="qr-code-outline"></ion-icon>
+          </div>
+          <div class="payment-details">
+            <h4>QRIS</h4>
+            <p>GPN, ShopeePay, Instant Scan</p>
+          </div>
+          <div class="payment-check-wrapper">
+            <div class="radio-indicator">
+              <div class="inner-dot" *ngIf="selectedPayment === 'QRIS'"></div>
+            </div>
+          </div>
+        </button>
+
+        <!-- CREDIT CARD -->
+        <button
+          class="payment-method-card"
+          [class.active]="selectedPayment === 'Credit Card'"
+          (click)="selectPayment('Credit Card')">
+          <div class="payment-icon-wrapper">
+            <ion-icon name="card-outline"></ion-icon>
+          </div>
+          <div class="payment-details">
+            <h4>Credit Card</h4>
+            <p>Visa, MasterCard, JCB, Amex</p>
+          </div>
+          <div class="payment-check-wrapper">
+            <div class="radio-indicator">
+              <div class="inner-dot" *ngIf="selectedPayment === 'Credit Card'"></div>
+            </div>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="step-button-group">
+      <button
+        class="secondary-btn ion-activatable ripple-parent"
+        (click)="prevStep()">
+        Back
+        <ion-ripple-effect></ion-ripple-effect>
+      </button>
+      <button
+        class="next-btn primary-btn ion-activatable ripple-parent"
+        (click)="goToPaymentInstruction()">
+        Confirm
+        <ion-ripple-effect></ion-ripple-effect>
+      </button>
+    </div>
+  </div>
+
+</ion-content>

@@ -1,0 +1,98 @@
+<ion-content class="cert-detail-page">
+
+  <!-- TOAST NOTIFICATIONS -->
+  <div class="custom-toast" *ngIf="downloaded">
+    <ion-icon name="checkmark-circle"></ion-icon>
+    <span>Sertifikat berhasil diunduh!</span>
+  </div>
+
+  <div class="custom-toast" *ngIf="shared">
+    <ion-icon name="checkmark-circle"></ion-icon>
+    <span>Tautan sertifikat berhasil dibagikan!</span>
+  </div>
+
+  <!-- HEADER -->
+  <div class="cert-header">
+    <button class="back-btn ion-activatable ripple-parent" (click)="goBack()">
+      <ion-icon name="arrow-back-outline"></ion-icon>
+      <ion-ripple-effect></ion-ripple-effect>
+    </button>
+    <h1>View Certificate</h1>
+    <div style="width: 44px;"></div> <!-- Spacer to center title -->
+  </div>
+
+  <!-- THE DIGITAL CERTIFICATE FRAME -->
+  <div class="certificate-container animate-fade-in" *ngIf="cert">
+    <div class="certificate-border">
+      <div class="certificate-inner">
+        
+        <!-- Corner decorations -->
+        <div class="corner top-left"></div>
+        <div class="corner top-right"></div>
+        <div class="corner bottom-left"></div>
+        <div class="corner bottom-right"></div>
+
+        <!-- JoyVent Brand Seal -->
+        <div class="cert-brand">
+          <ion-icon name="ribbon-outline" class="brand-seal"></ion-icon>
+          <span class="brand-name">JoyVent</span>
+        </div>
+
+        <h2 class="cert-heading">Certificate of Achievement</h2>
+        <p class="cert-subheading">This is proudly presented to</p>
+
+        <h1 class="cert-recipient">{{ cert.participantName }}</h1>
+
+        <p class="cert-body-text">
+          for active participation and successful completion of the digital event
+        </p>
+
+        <h3 class="cert-event-title">“{{ cert.eventTitle }}”</h3>
+
+        <p class="cert-organizer-text">
+          conducted by <strong>{{ cert.organizer }}</strong> on <strong>{{ cert.eventDate }}</strong>.
+        </p>
+
+        <!-- Certificate Footer (Signatures and Verification) -->
+        <div class="cert-footer">
+          
+          <div class="footer-sign">
+            <div class="signature-line">
+              <span class="signature-dummy">JoyVent Organizer</span>
+            </div>
+            <span class="sign-label">Authorized Signatory</span>
+          </div>
+
+          <div class="footer-qr">
+            <img [src]="cert.qrCodeUrl" alt="Verification QR" class="verification-qr">
+            <span class="cert-id-text">ID: {{ cert.id }}</span>
+          </div>
+
+          <div class="footer-badge">
+            <span class="badge-verified">
+              <ion-icon name="checkmark-circle"></ion-icon>
+              <span>Verified</span>
+            </span>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIONS BOTTOM BAR -->
+  <div class="action-buttons-wrapper">
+    <button class="action-btn primary-btn ion-activatable ripple-parent" (click)="downloadCertificate()">
+      <ion-icon name="download-outline"></ion-icon>
+      <span>Download Certificate</span>
+      <ion-ripple-effect></ion-ripple-effect>
+    </button>
+    <button class="action-btn secondary-btn ion-activatable ripple-parent" (click)="shareCertificate()">
+      <ion-icon name="share-social-outline"></ion-icon>
+      <span>Share Certificate</span>
+      <ion-ripple-effect></ion-ripple-effect>
+    </button>
+  </div>
+
+</ion-content>

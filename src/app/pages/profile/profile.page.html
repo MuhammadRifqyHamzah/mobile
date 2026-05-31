@@ -1,0 +1,85 @@
+<ion-content class="profile-page">
+  
+  <!-- Profile Hero Section with Blue Gradient -->
+  <div class="hero-section">
+    <!-- Glowing Orbs (Gen-Z Style Glows) -->
+    <div class="hero-glow-1"></div>
+    <div class="hero-glow-2"></div>
+
+    <!-- App Branding -->
+    <div class="profile-brand">
+      <img src="assets/images/Logo-JoyVent.jpg" class="profile-brand-logo" alt="JoyVent Logo">
+      <span class="profile-brand-name">JoyVent</span>
+    </div>
+    
+    <!-- Profile Header/Photo area -->
+    <div class="avatar-container">
+      <img [src]="userAvatar" alt="Profile Picture" class="profile-avatar">
+    </div>
+    
+    <h2 class="user-name">{{ userName }}</h2>
+    <p class="user-email">{{ userEmail }}</p>
+  </div>
+
+  <!-- Main Container -->
+  <div class="profile-container">
+    
+    <!-- Statistics Card Horizontal Row -->
+    <div class="stats-card">
+      <div class="stat-item">
+        <div class="stat-icon-wrapper ticket-bg">
+          <ion-icon name="ticket-outline"></ion-icon>
+        </div>
+        <div class="stat-details">
+          <h3>{{ activeTicketsCount }}</h3>
+          <p>Tickets</p>
+        </div>
+      </div>
+      <div class="stat-divider"></div>
+      
+      <div class="stat-item">
+        <div class="stat-icon-wrapper heart-bg">
+          <ion-icon name="heart-outline"></ion-icon>
+        </div>
+        <div class="stat-details">
+          <h3>{{ savedEventsCount }}</h3>
+          <p>Saved</p>
+        </div>
+      </div>
+      <div class="stat-divider"></div>
+      
+      <div class="stat-item">
+        <div class="stat-icon-wrapper history-bg">
+          <ion-icon name="time-outline"></ion-icon>
+        </div>
+        <div class="stat-details">
+          <h3>{{ historyCount }}</h3>
+          <p>History</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rounded Menu Card -->
+    <div class="menu-card">
+      @for (item of menuItems; track item.title) {
+        <div class="menu-item" (click)="handleMenuClick(item.action)">
+          <div class="menu-left">
+            <div class="menu-icon-wrapper">
+              <ion-icon [name]="item.icon"></ion-icon>
+            </div>
+            <span class="menu-title">{{ item.title }}</span>
+          </div>
+          <ion-icon name="chevron-forward-outline" class="menu-arrow"></ion-icon>
+        </div>
+      }
+    </div>
+
+    <!-- Modern Red Outline Logout Button -->
+    <button class="logout-btn" (click)="logout()">
+      <ion-icon name="log-out-outline"></ion-icon>
+      <span>Log Out</span>
+    </button>
+    
+  </div>
+
+</ion-content>

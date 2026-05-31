@@ -1,0 +1,193 @@
+<ion-content class="my-ticket-page">
+
+  <!-- HEADER GRADIENT MD3 SECTION -->
+  <div class="tickets-header">
+    <div class="header-glow-1"></div>
+    <div class="header-glow-2"></div>
+
+    <div class="header-top">
+      <div class="header-title-area">
+        <h1>My Tickets</h1>
+        <p>Manage all your booked events</p>
+      </div>
+      <div class="header-icon-badge ion-activatable ripple-parent">
+        <ion-icon name="ticket-outline"></ion-icon>
+        <ion-ripple-effect></ion-ripple-effect>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING SEGMENT / STATISTICS CARD -->
+  <div class="tab-container-floating">
+    <button
+      class="ion-activatable ripple-parent"
+      [class.active]="selectedTab === 'upcoming'"
+      (click)="changeTab('upcoming')">
+      Upcoming
+      <ion-ripple-effect></ion-ripple-effect>
+    </button>
+
+    <button
+      class="ion-activatable ripple-parent"
+      [class.active]="selectedTab === 'unpaid'"
+      (click)="changeTab('unpaid')">
+      Unpaid
+      <ion-ripple-effect></ion-ripple-effect>
+    </button>
+
+    <button
+      class="ion-activatable ripple-parent"
+      [class.active]="selectedTab === 'completed'"
+      (click)="changeTab('completed')">
+      Completed
+      <ion-ripple-effect></ion-ripple-effect>
+    </button>
+
+    <button
+      class="ion-activatable ripple-parent"
+      [class.active]="selectedTab === 'canceled'"
+      (click)="changeTab('canceled')">
+      Canceled
+      <ion-ripple-effect></ion-ripple-effect>
+    </button>
+
+    <button
+      class="ion-activatable ripple-parent"
+      [class.active]="selectedTab === 'refund'"
+      (click)="changeTab('refund')">
+      Refund
+      <ion-ripple-effect></ion-ripple-effect>
+    </button>
+  </div>
+
+  <!-- TICKET LIST -->
+
+  <div class="ticket-list">
+
+    <div
+      class="ticket-card"
+      *ngFor="let ticket of getFilteredTickets()">
+
+      <!-- IMAGE CONTAINER -->
+
+      <div class="image-container">
+
+        <img
+          [src]="ticket.image"
+          alt="event">
+
+        <!-- QTY BADGE -->
+
+        <div class="qty-badge">
+
+          <ion-icon name="ticket-outline"></ion-icon>
+
+          <span>{{ ticket.qty }} {{ ticket.qty > 1 ? 'Tickets' : 'Ticket' }}</span>
+
+        </div>
+
+      </div>
+
+      <!-- CONTENT -->
+
+      <div class="ticket-content">
+
+        <h2>{{ ticket.title }}</h2>
+
+        <!-- DATE -->
+
+        <div class="info-row">
+
+          <ion-icon name="calendar-outline"></ion-icon>
+
+          <span>{{ ticket.date }} • {{ ticket.time }}</span>
+
+        </div>
+
+        <!-- LOCATION -->
+
+        <div class="info-row">
+
+          <ion-icon name="location-outline"></ion-icon>
+
+          <span>{{ ticket.location }}</span>
+
+        </div>
+
+      </div>
+
+      <!-- TICKET NOTCH & DIVIDER -->
+
+      <div class="ticket-divider-wrapper">
+
+        <div class="notch left"></div>
+
+        <div class="notch right"></div>
+
+        <div class="dashed-line"></div>
+
+      </div>
+
+      <!-- BOTTOM ACTION -->
+
+      <div class="bottom-section">
+
+        <div class="status-area">
+          <span class="status-badge" [ngClass]="ticket.status.toLowerCase()">
+            {{ ticket.status }}
+          </span>
+          <span class="status-subtext" *ngIf="ticket.status === 'Canceled'">Payment Expired</span>
+        </div>
+
+        <button
+          *ngIf="ticket.status !== 'Unpaid' && ticket.status !== 'Canceled'"
+          class="view-btn"
+          (click)="goToTicketDetail(ticket)">
+
+          View Ticket
+
+        </button>
+
+        <button
+          *ngIf="ticket.status === 'Unpaid'"
+          class="continue-pay-btn"
+          (click)="continuePayment(ticket)">
+
+          Continue Payment
+
+        </button>
+
+        <button
+          *ngIf="ticket.status === 'Canceled'"
+          class="book-again-btn"
+          (click)="bookAgain(ticket)">
+
+          Book Again
+
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- EMPTY STATE -->
+
+    <div
+      class="empty-state animate-fade-in"
+      *ngIf="getFilteredTickets().length === 0">
+
+      <div class="empty-icon-wrapper">
+
+        <ion-icon name="ticket-outline"></ion-icon>
+
+      </div>
+
+      <h2>No Tickets Found</h2>
+
+      <p>You don't have any tickets in the {{ selectedTab }} category yet. Let's find some amazing events!</p>
+
+    </div>
+
+  </div>
+
+</ion-content>

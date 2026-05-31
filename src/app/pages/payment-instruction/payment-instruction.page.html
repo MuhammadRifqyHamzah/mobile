@@ -1,0 +1,156 @@
+<ion-content class="payment-page">
+
+  <!-- TOAST NOTIFICATION FOR COPY -->
+  <div class="custom-toast" *ngIf="copied">
+    <ion-icon name="checkmark-circle"></ion-icon>
+    <span>Nomor berhasil disalin!</span>
+  </div>
+
+  <!-- HEADER -->
+  <div class="payment-header">
+    <button class="back-btn ion-activatable ripple-parent" (click)="goBack()">
+      <ion-icon name="arrow-back-outline"></ion-icon>
+      <ion-ripple-effect></ion-ripple-effect>
+    </button>
+    <h1>Instruksi Bayar</h1>
+  </div>
+
+  <!-- COUNTDOWN CARD -->
+  <div class="countdown-card">
+    <div class="countdown-details">
+      <p>Selesaikan pembayaran dalam waktu</p>
+      <h2 [class.warning]="isWarning" [class.blink]="isBlinking" [class.expired]="isExpired">
+        <span class="time-part">{{ minutes < 10 ? '0' + minutes : minutes }}</span>
+        <span class="colon">:</span>
+        <span class="time-part">{{ seconds < 10 ? '0' + seconds : seconds }}</span>
+      </h2>
+    </div>
+    <div class="countdown-icon">
+      <ion-icon name="time-outline"></ion-icon>
+    </div>
+  </div>
+
+  <!-- TOTAL CARD -->
+  <div class="payment-total-card">
+    <div class="total-info">
+      <span>Total Pembayaran</span>
+      <h2>Rp{{ totalPrice.toLocaleString('id-ID') }}</h2>
+    </div>
+  </div>
+
+  <!-- PAYMENT DETAIL / VA CARD -->
+  <div class="payment-details-card">
+    <div class="details-top">
+      <div class="logo-wrapper">
+        <span *ngIf="paymentMethod === 'Bank Transfer'">🏦</span>
+        <span *ngIf="paymentMethod === 'E-Wallet'">📱</span>
+        <span *ngIf="paymentMethod === 'QRIS'">📊</span>
+        <span *ngIf="paymentMethod === 'Credit Card'">💳</span>
+      </div>
+      <div class="method-info">
+        <h3>{{ paymentMethod }}</h3>
+        <p *ngIf="paymentMethod === 'Bank Transfer'">Virtual Account Transfer</p>
+        <p *ngIf="paymentMethod === 'E-Wallet'">E-Wallet Payment Gateway</p>
+        <p *ngIf="paymentMethod === 'QRIS'">GPN Standard QRIS</p>
+        <p *ngIf="paymentMethod === 'Credit Card'">Secured Credit Card Billing</p>
+      </div>
+    </div>
+    
+    <div class="divider"></div>
+
+    <!-- IF QRIS, DISPLAY QR CODE IMAGE -->
+    <div class="qris-display-container" *ngIf="paymentMethod === 'QRIS'">
+      <div class="qr-code-box">
+        <img
+          src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=JOYVENT-QRIS-92841"
+          alt="QRIS Code"
+        >
+      </div>
+      <p class="qr-instruction">Scan kode QR di atas menggunakan aplikasi e-wallet atau m-banking Anda untuk menyelesaikan pembayaran.</p>
+    </div>
+
+    <!-- ELSE, DISPLAY VA / CODE FIELDS -->
+    <div class="va-section" *ngIf="paymentMethod !== 'QRIS'">
+      <div class="va-details">
+        <p *ngIf="paymentMethod === 'Bank Transfer'">Nomor Virtual Account</p>
+        <p *ngIf="paymentMethod === 'E-Wallet'">Nomor HP / Kode Bayar</p>
+        <p *ngIf="paymentMethod === 'Credit Card'">Nomor Invoice / Kode CC</p>
+        <h2>{{ getPaymentCode() }}</h2>
+      </div>
+      <button class="copy-btn ion-activatable ripple-parent" (click)="copyCode()">
+        <ion-icon name="copy-outline"></ion-icon>
+        <span>Salin</span>
+        <ion-ripple-effect></ion-ripple-effect>
+      </button>
+    </div>
+  </div>
+
+  <!-- PAYMENT GUIDES ACCORDION -->
+  <div class="guides-wrapper">
+    <h3 class="guides-section-title">Petunjuk Pembayaran</h3>
+
+    <div class="guide-card">
+      
+      <!-- GUIDE 1 -->
+      <div class="guide-item">
+        <div class="guide-title" (click)="toggleGuide(1)">
+          <span>{{ getGuideTitle(1) }}</span>
+          <ion-icon [name]="guide1Open ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+        </div>
+        <div class="guide-content" [class.open]="guide1Open">
+          <ol>
+            <li>Buka aplikasi m-banking atau e-wallet pilihan Anda.</li>
+            <li>Pilih menu <strong>Bayar / Transfer</strong>.</li>
+            <li *ngIf="paymentMethod !== 'QRIS'">Masukkan kode Virtual Account / Kode Bayar: <strong>{{ getPaymentCode() }}</strong>.</li>
+            <li *ngIf="paymentMethod === 'QRIS'">Scan kode QRIS yang tampil di layar aplikasi JoyVent.</li>
+            <li>Periksa kecocokan nama dan nominal bayar: <strong>Rp{{ totalPrice.toLocaleString('id-ID') }}</strong>.</li>
+            <li>Masukkan PIN transaksi Anda untuk menyelesaikan pembayaran.</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- GUIDE 2 -->
+      <div class="guide-item">
+        <div class="guide-title" (click)="toggleGuide(2)">
+          <span>{{ getGuideTitle(2) }}</span>
+          <ion-icon [name]="guide2Open ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+        </div>
+        <div class="guide-content" [class.open]="guide2Open">
+          <ol>
+            <li>Login ke portal Internet Banking Anda.</li>
+            <li>Navigasi ke menu transfer tagihan virtual account atau e-payment.</li>
+            <li>Lakukan pembayaran sesuai detail nominal tagihan Anda.</li>
+            <li>Simpan bukti bayar digital atau screenshot sebagai cadangan.</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- GUIDE 3 -->
+      <div class="guide-item">
+        <div class="guide-title" (click)="toggleGuide(3)">
+          <span>{{ getGuideTitle(3) }}</span>
+          <ion-icon [name]="guide3Open ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+        </div>
+        <div class="guide-content" [class.open]="guide3Open">
+          <p class="terms-paragraph">
+            * Transaksi ini dilindungi sistem keamanan 3D-Secure. Pastikan pembayaran diselesaikan sebelum batas waktu countdown berakhir. Setelah berhasil, status pesanan Anda akan terupdate otomatis.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FIXED BOTTOM BUTTON WRAPPER -->
+  <div class="payment-button-wrapper">
+    <button class="pay-now-btn primary-btn ion-activatable ripple-parent" (click)="goToSuccess()" [disabled]="isExpired">
+      <span>{{ isExpired ? 'Waktu Pembayaran Habis' : 'Selesai Bayar' }}</span>
+      <ion-ripple-effect *ngIf="!isExpired"></ion-ripple-effect>
+    </button>
+    <button class="back-home-btn secondary-btn ion-activatable ripple-parent" (click)="backToHome()">
+      <span>Back to Home</span>
+      <ion-ripple-effect></ion-ripple-effect>
+    </button>
+  </div>
+
+</ion-content>

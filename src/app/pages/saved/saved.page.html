@@ -1,0 +1,133 @@
+<ion-content class="saved-page">
+  <!-- Glowing Background Accent (Gen-Z Style Glows) -->
+  <div class="glow-accent-1"></div>
+  <div class="glow-accent-2"></div>
+
+  <!-- MODERN HEADER SAVED EVENTS -->
+  <div class="saved-header">
+    <div class="header-glow-1"></div>
+    <div class="header-glow-2"></div>
+
+    <div class="header-top">
+      <div class="header-title-area">
+        <h1>Saved Events</h1>
+        <p>Your favorite events in one place</p>
+      </div>
+      <div class="header-icon-badge ion-activatable ripple-parent">
+        <ion-icon name="heart"></ion-icon>
+        <ion-ripple-effect></ion-ripple-effect>
+      </div>
+    </div>
+
+    <!-- SEARCH BAR -->
+    <div class="search-box">
+      <ion-icon name="search-outline" class="search-icon"></ion-icon>
+      <input
+        type="text"
+        placeholder="Search saved events..."
+        [(ngModel)]="searchText"
+        (input)="onSearchChange()"
+      >
+    </div>
+
+    <!-- CATEGORY PILLS -->
+    <div class="category-wrapper">
+      @for (cat of categories; track cat) {
+        <button 
+          class="category ion-activatable ripple-parent" 
+          [class.active]="selectedCategory === cat"
+          (click)="selectCategory(cat)">
+          {{ cat }}
+          <ion-ripple-effect></ion-ripple-effect>
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- EVENTS LIST -->
+  @if (filteredEvents.length > 0) {
+    <div class="cards-container">
+      @for (event of filteredEvents; track event.id) {
+        <div class="event-card" [class.faded]="event.soldOut" (click)="goToDetail(event.id)">
+          <div class="event-image">
+            <img [src]="event.image" [alt]="event.title">
+            
+            @if (event.soldOut) {
+              <div class="event-badge sold-out">SOLD OUT</div>
+              <div class="sold-out-overlay">
+                <span>Fully Booked</span>
+              </div>
+            } @else {
+              <!-- Category Badge overlay -->
+              <div class="event-badge">
+                {{ event.badge }}
+              </div>
+            }
+
+            <!-- Favorite Button active overlay -->
+            <div class="favorite-btn active" (click)="toggleSave($event, event.id)">
+              <ion-icon name="heart"></ion-icon>
+            </div>
+
+            <!-- Price tag overlay -->
+            <div class="event-price">
+              <p>Start From</p>
+              <h3>{{ event.price }}</h3>
+            </div>
+          </div>
+
+          <div class="event-content">
+            <h3>{{ event.title }}</h3>
+            
+            <div class="event-meta-info">
+              <div class="meta-item">
+                <ion-icon name="calendar-outline"></ion-icon>
+                <span>{{ event.date }}</span>
+              </div>
+              <div class="meta-item">
+                <ion-icon name="location-outline"></ion-icon>
+                <span>{{ event.location }}</span>
+              </div>
+            </div>
+
+            @if (event.soldOut) {
+              <div class="card-progress-container">
+                <div class="progress-bar-wrapper">
+                  <div class="progress-bar-fill" style="width: 100%"></div>
+                </div>
+                <div class="progress-info">
+                  <span>100% Tickets Sold Out</span>
+                </div>
+              </div>
+            }
+
+            <!-- Premium Gradient Button -->
+            <button class="detail-btn" [class.disabled]="event.soldOut">
+              {{ event.soldOut ? 'Fully Booked' : 'View Details' }}
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <!-- BEAUTIFUL EMPTY STATE -->
+    <div class="empty-state">
+      <div class="empty-icon-wrapper">
+        <div class="empty-glow"></div>
+        <ion-icon name="heart-outline" class="empty-icon"></ion-icon>
+      </div>
+      <h2>No Saved Events</h2>
+      <p>
+        @if (searchText || selectedCategory !== 'All') {
+          No saved events match your search filters.
+        } @else {
+          Your favorite events will appear here. Start exploring and saving events now!
+        }
+      </p>
+      <button class="explore-btn" (click)="goToHome()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+        <span>Explore Events</span>
+      </button>
+    </div>
+  }
+</ion-content>

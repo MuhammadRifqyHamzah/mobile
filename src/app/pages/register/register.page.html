@@ -1,0 +1,134 @@
+<ion-content fullscreen="true" class="register-page">
+
+  <!-- HEADER -->
+  <div class="auth-header">
+    <h2>Create Account</h2>
+  </div>
+
+  <!-- BODY -->
+  <div class="auth-body">
+
+    <!-- LOGO IMAGE -->
+    <div class="logo-img-wrapper">
+      <img src="assets/images/Logo-JoyVent.jpg" class="app-logo-img" alt="JoyVent Logo">
+    </div>
+
+    <!-- TITLE -->
+    <h1 class="auth-title">
+      Welcome!
+    </h1>
+
+    <p class="auth-subtitle">
+      Sign up to book your favorite events
+    </p>
+
+    <!-- FULL NAME -->
+    <div class="form-group">
+
+      <label class="form-label">
+        Full Name
+      </label>
+
+      <div class="input-wrap">
+
+        <ion-icon
+          name="person-outline">
+        </ion-icon>
+
+        <input
+          type="text"
+          placeholder="Nama lengkap kamu">
+
+      </div>
+
+    </div>
+
+    <!-- EMAIL -->
+    <div class="form-group">
+
+      <label class="form-label uppercase">
+        EMAIL
+      </label>
+
+      <div class="input-wrap">
+
+        <ion-icon
+          name="mail-outline">
+        </ion-icon>
+
+        <input
+          type="email"
+          placeholder="abcd@gmail.com">
+
+      </div>
+
+      <div class="field-error">
+        Email ini sudah terdaftar!
+      </div>
+
+    </div>
+
+    <!-- PASSWORD -->
+    <div class="form-group">
+
+      <label class="form-label">
+        Password
+      </label>
+
+      <div class="input-wrap">
+
+        <ion-icon
+          name="lock-closed-outline">
+        </ion-icon>
+
+        <input
+          type="password"
+          placeholder="Min. 6 karakter">
+
+        <ion-icon
+          name="eye-outline">
+        </ion-icon>
+
+      </div>
+
+      <div class="field-hint">
+        Minimal 6 karakter
+      </div>
+
+    </div>
+
+    <!-- BUTTON -->
+    <button class="btn-primary" (click)="signUp()">
+      Sign up
+    </button>
+
+    <!-- DIVIDER -->
+    <div class="divider">
+      or
+    </div>
+
+    <!-- GOOGLE -->
+    <button class="btn-google">
+
+      <img
+        src="https://www.svgrepo.com/show/475656/google-color.svg"
+        class="google-icon">
+
+      Sign up with Google
+
+    </button>
+
+    <!-- FOOTER -->
+    <p class="auth-footer">
+
+      Already have an account?
+
+      <a routerLink="/login">
+        Log in now
+      </a>
+
+    </p>
+
+  </div>
+
+</ion-content>

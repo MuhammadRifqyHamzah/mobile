@@ -1,0 +1,181 @@
+<ion-content class="help-support-page">
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="custom-toast" *ngIf="toastVisible">
+    <ion-icon name="information-circle-outline"></ion-icon>
+    <span>{{ toastMessage }}</span>
+  </div>
+
+  <!-- HEADER -->
+  <div class="help-header">
+    <!-- Glowing background elements -->
+    <div class="header-glow-1"></div>
+    <div class="header-glow-2"></div>
+    
+    <!-- Floating Decorative Branding Icons (Modern look) -->
+    <div class="decor-icons">
+      <div class="decor-icon icon-help">
+        <ion-icon name="help-circle-outline"></ion-icon>
+      </div>
+      <div class="decor-icon icon-support">
+        <ion-icon name="headset-outline"></ion-icon>
+      </div>
+      <div class="decor-icon icon-chat">
+        <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+      </div>
+    </div>
+    
+    <button class="back-btn ion-activatable ripple-parent" (click)="goBack()">
+      <ion-icon name="arrow-back-outline"></ion-icon>
+      <ion-ripple-effect></ion-ripple-effect>
+    </button>
+    
+    <div class="header-titles">
+      <h1>Help & Support</h1>
+      <p>How can we help you today?</p>
+    </div>
+  </div>
+
+  <div class="page-content">
+
+    <!-- FAQ SECTION -->
+    <div class="section-container">
+      <div class="section-header">
+        <div class="section-title-wrapper">
+          <ion-icon name="help-circle-outline" class="section-icon"></ion-icon>
+          <h3 class="section-title">Frequently Asked Questions</h3>
+        </div>
+      </div>
+      
+      <div class="faq-list">
+        <div 
+          *ngFor="let faq of faqs; let i = index" 
+          class="faq-card" 
+          [class.active]="faq.expanded"
+          (click)="toggleFaq(i)"
+        >
+          <div class="faq-header">
+            <h4>{{ faq.q }}</h4>
+            <ion-icon 
+              [name]="faq.expanded ? 'chevron-up-outline' : 'chevron-down-outline'"
+              class="chevron-icon"
+            ></ion-icon>
+          </div>
+          
+          <div class="faq-answer" [class.expanded]="faq.expanded">
+            <div class="faq-answer-content">
+              <p class="answer-text">{{ faq.a }}</p>
+              <ul class="bullet-list" *ngIf="faq.bulletPoints && faq.bulletPoints.length > 0">
+                <li *ngFor="let point of faq.bulletPoints">{{ point }}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTACT SUPPORT SECTION -->
+    <div class="section-container">
+      <div class="section-header">
+        <div class="section-title-wrapper">
+          <ion-icon name="headset-outline" class="section-icon"></ion-icon>
+          <h3 class="section-title">Contact Support</h3>
+        </div>
+      </div>
+
+      <div class="support-card">
+        <div class="support-info-row">
+          <div class="info-item">
+            <div class="info-icon-wrapper email-bg">
+              <ion-icon name="mail-outline"></ion-icon>
+            </div>
+            <div class="info-details">
+              <span>Email Address</span>
+              <h4>support@joyvent.com</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="support-divider"></div>
+
+        <div class="support-info-row">
+          <div class="info-item">
+            <div class="info-icon-wrapper wa-bg">
+              <ion-icon name="logo-whatsapp"></ion-icon>
+            </div>
+            <div class="info-details">
+              <span>WhatsApp Chat</span>
+              <h4>+62 812-3456-7890</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="support-divider"></div>
+
+        <div class="support-info-row">
+          <div class="info-item">
+            <div class="info-icon-wrapper time-bg">
+              <ion-icon name="time-outline"></ion-icon>
+            </div>
+            <div class="info-details">
+              <span>Operating Hours</span>
+              <h4>08:00 - 21:00 WIB</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="support-action">
+          <button class="support-btn primary-btn ion-activatable ripple-parent" (click)="contactSupport()">
+            <span>Contact Support</span>
+            <ion-ripple-effect></ion-ripple-effect>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- REFUND POLICY SECTION -->
+    <div class="section-container">
+      <div class="section-header">
+        <div class="section-title-wrapper">
+          <ion-icon name="document-text-outline" class="section-icon"></ion-icon>
+          <h3 class="section-title">Refund Policy</h3>
+        </div>
+      </div>
+
+      <div class="policy-card">
+        <div class="policy-content">
+          <ul class="policy-list">
+            <li>
+              <span class="policy-bullet">•</span>
+              <p>Refund requests must be submitted before the event starts</p>
+            </li>
+            <li>
+              <span class="policy-bullet">•</span>
+              <p>Completed events are not eligible for refunds</p>
+            </li>
+            <li>
+              <span class="policy-bullet">•</span>
+              <p>Canceled events receive full refunds</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORT PROBLEM SECTION -->
+    <div class="section-container report-section">
+      <button class="report-btn ion-activatable ripple-parent" (click)="reportProblem()">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        <span>Report a Problem</span>
+        <ion-ripple-effect></ion-ripple-effect>
+      </button>
+    </div>
+
+    <!-- APP VERSION FOOTER -->
+    <div class="version-footer">
+      <p>JoyVent v1.0.0</p>
+    </div>
+
+  </div>
+
+</ion-content>

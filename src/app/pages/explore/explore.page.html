@@ -1,0 +1,142 @@
+<ion-content class="explore-page">
+
+  <!-- MODERN HEADER WITH BLUE GRADIENT -->
+  <div class="explore-header">
+    <div class="header-glow-1"></div>
+    <div class="header-glow-2"></div>
+
+    <div class="header-top">
+      <div class="header-title-area">
+        <h1>Explore Events</h1>
+        <p>Find your favorite events easily</p>
+      </div>
+      <button class="header-icon-btn ion-activatable ripple-parent">
+        <ion-icon name="search-outline"></ion-icon>
+        <ion-ripple-effect></ion-ripple-effect>
+      </button>
+    </div>
+
+    <!-- SEARCH BAR -->
+    <div class="search-box">
+      <ion-icon name="search-outline" class="search-icon"></ion-icon>
+      <input
+        type="text"
+        placeholder="Search concerts, seminars, sports..."
+        [(ngModel)]="searchText"
+        (ngModelChange)="filterAndSortEvents()"
+      >
+    </div>
+  </div>
+
+  <!-- CATEGORY FILTER CHIPS -->
+  <div class="category-wrapper">
+    @for (cat of categories; track cat) {
+      <button
+        class="category ion-activatable ripple-parent"
+        [class.active]="selectedCategory === cat"
+        (click)="selectCategory(cat)">
+        {{ cat }}
+        <ion-ripple-effect></ion-ripple-effect>
+      </button>
+    }
+  </div>
+
+  <!-- EXTRA MODERN FILTERS SECTION (PRICE & SORT BY) -->
+  <div class="extra-filters">
+    
+    <!-- PRICE FILTER -->
+    <div class="filter-select-wrapper">
+      <ion-icon name="funnel-outline" class="select-icon"></ion-icon>
+      <select [(ngModel)]="selectedPrice" (change)="filterAndSortEvents()">
+        <option value="All">All Prices</option>
+        <option value="Free">Free</option>
+        <option value="Paid">Paid</option>
+      </select>
+      <ion-icon name="chevron-down-outline" class="chevron-icon"></ion-icon>
+    </div>
+
+    <!-- SORT BY FILTER -->
+    <div class="filter-select-wrapper">
+      <ion-icon name="swap-vertical-outline" class="select-icon"></ion-icon>
+      <select [(ngModel)]="selectedSort" (change)="filterAndSortEvents()">
+        <option value="Popular">Popular</option>
+        <option value="Newest">Newest</option>
+        <option value="Lowest Price">Cheapest</option>
+      </select>
+      <ion-icon name="chevron-down-outline" class="chevron-icon"></ion-icon>
+    </div>
+
+  </div>
+
+  <!-- EMPTY STATE -->
+  @if (filteredEvents.length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon-wrapper">
+        <ion-icon name="search-outline"></ion-icon>
+      </div>
+      <h2>No events found</h2>
+      <p>Try different keywords or categories</p>
+    </div>
+  }
+
+  <!-- EVENT CARD LIST -->
+  <div class="events-container">
+    @for (event of filteredEvents; track event.id) {
+      <button
+        class="event-card"
+        [class.faded]="event.soldOut"
+        (click)="goToDetail(event.id)">
+
+        <div class="event-image">
+          <img
+            [src]="event.image"
+            [alt]="event.title"
+          >
+          
+          @if (event.soldOut) {
+            <div class="event-badge sold-out">SOLD OUT</div>
+            <div class="sold-out-overlay">
+              <span>Fully Booked</span>
+            </div>
+          } @else {
+            <div class="event-badge">
+              {{ event.badge }}
+            </div>
+          }
+          
+          <div 
+            class="favorite-btn" 
+            [class.active]="isSaved(event.id)"
+            (click)="toggleSave($event, event.id)">
+            <ion-icon [name]="isSaved(event.id) ? 'heart' : 'heart-outline'"></ion-icon>
+          </div>
+          <div class="event-price">
+            <p>Start From</p>
+            <h3>{{ event.price }}</h3>
+          </div>
+        </div>
+
+        <div class="event-content">
+          <h3>{{ event.title }}</h3>
+          <div class="event-info">
+            <span>📅 {{ event.date }}</span>
+            <span>📍 {{ event.location }}</span>
+          </div>
+          
+          @if (event.soldOut) {
+            <div class="card-progress-container">
+              <div class="progress-bar-wrapper">
+                <div class="progress-bar-fill" style="width: 100%"></div>
+              </div>
+              <div class="progress-info">
+                <span>100% Tickets Sold Out</span>
+              </div>
+            </div>
+          }
+        </div>
+
+      </button>
+    }
+  </div>
+
+</ion-content>
