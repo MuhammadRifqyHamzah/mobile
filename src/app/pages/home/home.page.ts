@@ -41,7 +41,7 @@ export class HomePage implements OnInit, OnDestroy {
   selectedCategory = 'All';
   categories = ['All', 'Entertainment', 'Education', 'Sports', 'Business', 'Community'];
   unreadNotificationsCount = 0;
-  
+
   private profileSubscription!: Subscription;
 
   constructor() {

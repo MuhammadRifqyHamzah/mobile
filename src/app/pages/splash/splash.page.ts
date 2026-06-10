@@ -1,6 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { IonContent } from '@ionic/angular/standalone';
+import { IonContent, NavController } from '@ionic/angular/standalone';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -11,15 +10,15 @@ import { AuthService } from '../../services/auth.service';
   imports: [IonContent]
 })
 export class SplashPage implements OnInit {
-  private router = inject(Router);
+  private navCtrl = inject(NavController);
   private authService = inject(AuthService);
 
   ngOnInit() {
     setTimeout(() => {
       if (this.authService.isLoggedIn()) {
-        this.router.navigate(['/tabs/home']);
+        this.navCtrl.navigateRoot('/tabs/home');
       } else {
-        this.router.navigate(['/login']);
+        this.navCtrl.navigateRoot('/login');
       }
     }, 1500);
   }

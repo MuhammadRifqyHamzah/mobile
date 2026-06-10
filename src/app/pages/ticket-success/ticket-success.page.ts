@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import {
   IonContent,
   IonIcon,
-  IonRippleEffect
+  IonRippleEffect,
+  NavController
 } from '@ionic/angular/standalone';
 import {
   Router,
@@ -33,6 +34,7 @@ import { EventService } from '../../services/event.service';
 })
 export class TicketSuccessPage implements OnInit {
   private router = inject(Router);
+  private navCtrl = inject(NavController);
   private route = inject(ActivatedRoute);
   private eventService = inject(EventService);
 
@@ -188,6 +190,6 @@ export class TicketSuccessPage implements OnInit {
      GO TO HOME
   ========================= */
   goToHome() {
-    this.router.navigate(['/tabs/home']);
+    this.navCtrl.navigateRoot('/tabs/home');
   }
 }

@@ -14,7 +14,11 @@
     
     <!-- Profile Header/Photo area -->
     <div class="avatar-container">
-      <img [src]="userAvatar" alt="Profile Picture" class="profile-avatar">
+      @if (avatarFailed || !userAvatar) {
+        <div class="avatar-fallback">{{ getInitials(userName) }}</div>
+      } @else {
+        <img [src]="userAvatar" (error)="onAvatarError()" alt="Profile Picture" class="profile-avatar">
+      }
     </div>
     
     <h2 class="user-name">{{ userName }}</h2>

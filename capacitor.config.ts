@@ -1,7 +1,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
+  appId: 'com.joyvent.app',
   appName: 'mobile',
   webDir: 'www',
   server: {
@@ -17,6 +17,11 @@ const config: CapacitorConfig = {
       launchAutoHide: true,
       backgroundColor: "#ffffff", // Background putih biar cocok dengan logo
       androidScaleType: "CENTER_CROP"
+    },
+    GoogleAuth: {
+      scopes: ["profile", "email"],
+      clientId: "1046359789271-uv3c0lmtp77tq29st4bng4kovt1b4urf.apps.googleusercontent.com",
+      forceCodeForRefreshToken: true
     }
   }
 };

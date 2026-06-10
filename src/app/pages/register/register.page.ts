@@ -1,10 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
+import { ProfileService } from '../../services/profile.service';
 
 import {
   IonContent,
-  IonIcon
+  IonIcon,
+  NavController
 } from '@ionic/angular/standalone';
 
 import { addIcons } from 'ionicons';
@@ -13,7 +16,8 @@ import {
   personOutline,
   mailOutline,
   lockClosedOutline,
-  eyeOutline
+  eyeOutline,
+  eyeOffOutline
 } from 'ionicons/icons';
 
 @Component({
@@ -25,13 +29,21 @@ import {
   imports: [
     IonContent,
     IonIcon,
-    RouterLink
+    RouterLink,
+    FormsModule
   ]
 
 })
 export class RegisterPage {
   private router = inject(Router);
+  private navCtrl = inject(NavController);
   private authService = inject(AuthService);
+  private profileService = inject(ProfileService);
+
+  fullName = '';
+  email = '';
+  password = '';
+  showPassword = false;
 
   constructor() {
 
@@ -39,14 +51,22 @@ export class RegisterPage {
       personOutline,
       mailOutline,
       lockClosedOutline,
-      eyeOutline
+      eyeOutline,
+      eyeOffOutline
     });
 
   }
 
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
+
   signUp() {
+    this.profileService.loadProfileForUser(this.email || 'user@joyvent.com', {
+      name: this.fullName || 'User JoyVent'
+    });
     this.authService.login(); // Auto-login on sign up
-    this.router.navigate(['/tabs/home']);
+    this.navCtrl.navigateRoot('/tabs/home');
   }
 
 }

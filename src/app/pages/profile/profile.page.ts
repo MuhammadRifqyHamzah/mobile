@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { IonContent, IonIcon, NavController } from '@ionic/angular/standalone';
 import { Subscription } from 'rxjs';
 import { addIcons } from 'ionicons';
 import {
@@ -20,6 +20,7 @@ import {
 import { EventService } from '../../services/event.service';
 import { ProfileService } from '../../services/profile.service';
 import { AuthService } from '../../services/auth.service';
+import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 
 @Component({
   selector: 'app-profile',
@@ -31,12 +32,14 @@ import { AuthService } from '../../services/auth.service';
 export class ProfilePage implements OnInit, OnDestroy {
   private eventService = inject(EventService);
   private router = inject(Router);
+  private navCtrl = inject(NavController);
   private profileService = inject(ProfileService);
   private authService = inject(AuthService);
 
   userName = '';
   userEmail = '';
   userAvatar = '';
+  avatarFailed = false;
   
   // Statistics
   activeTicketsCount = 0;
@@ -103,6 +106,7 @@ export class ProfilePage implements OnInit, OnDestroy {
       this.userName = profile.fullName;
       this.userEmail = profile.email;
       this.userAvatar = profile.avatar;
+      this.avatarFailed = false;
     });
   }
 
@@ -197,8 +201,27 @@ export class ProfilePage implements OnInit, OnDestroy {
     }
   }
 
-  logout() {
+  async logout() {
     this.authService.logout();
-    this.router.navigate(['/login']);
+    this.profileService.clearProfile();
+    try {
+      await GoogleAuth.signOut();
+    } catch (e) {
+      console.log('Error signing out from Google:', e);
+    }
+    this.navCtrl.navigateRoot('/login');
+  }
+
+  onAvatarError() {
+    this.avatarFailed = true;
+  }
+
+  getInitials(name: string): string {
+    if (!name) return 'U';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length === 1) {
+      return parts[0].substring(0, 2).toUpperCase();
+    }
+    return (parts[0][0] + parts[1][0]).toUpperCase();
   }
 }

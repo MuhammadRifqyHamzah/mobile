@@ -24,14 +24,25 @@
 
   <!-- PROFILE PHOTO SECTION -->
   <div class="profile-photo-section">
-    <div class="avatar-wrapper">
-      <img [src]="avatar" alt="Avatar">
-      <button class="camera-btn ion-activatable ripple-parent">
+    <div class="avatar-wrapper" (click)="triggerFileInput()">
+      @if (avatarFailed || !avatar) {
+        <div class="avatar-fallback">{{ getInitials(fullName) }}</div>
+      } @else {
+        <img [src]="avatar" (error)="onAvatarError()" alt="Avatar">
+      }
+      <button class="camera-btn ion-activatable ripple-parent" (click)="triggerFileInput(); $event.stopPropagation()">
         <ion-icon name="camera-outline"></ion-icon>
         <ion-ripple-effect></ion-ripple-effect>
       </button>
     </div>
-    <span class="change-photo-text">Change Profile Photo</span>
+    <span class="change-photo-text" (click)="triggerFileInput()">Change Profile Photo</span>
+    <input 
+      type="file" 
+      #fileInput 
+      style="display: none" 
+      accept="image/*" 
+      (change)="onFileSelected($event)"
+    >
   </div>
 
   <!-- PERSONAL INFORMATION FORM CARD -->

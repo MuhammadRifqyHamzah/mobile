@@ -9,7 +9,7 @@ export class AuthService {
   private loginSubject = new BehaviorSubject<boolean>(this.hasToken());
   isLoggedIn$: Observable<boolean> = this.loginSubject.asObservable();
 
-  constructor() {}
+  constructor() { }
 
   private hasToken(): boolean {
     return !!localStorage.getItem(this.TOKEN_KEY);

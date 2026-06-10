@@ -1,4 +1,4 @@
-package io.ionic.app;
+package com.joyvent.app;
 
 import com.getcapacitor.BridgeActivity;
 

@@ -1,10 +1,5 @@
 <ion-content fullscreen="true" class="login-page">
 
-  <!-- HEADER -->
-  <div class="auth-header">
-    <h2>Log in Page</h2>
-  </div>
-
   <!-- BODY -->
   <div class="auth-body">
 
@@ -35,6 +30,8 @@
 
         <input
           type="email"
+          [(ngModel)]="email"
+          name="email"
           placeholder="abcd@gmail.com">
 
       </div>
@@ -53,11 +50,14 @@
         <ion-icon name="lock-closed-outline"></ion-icon>
 
         <input
-          type="password"
+          [type]="showPassword ? 'text' : 'password'"
+          [(ngModel)]="password"
+          name="password"
           placeholder="••••••••••">
 
         <ion-icon
-          name="eye-outline">
+          [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"
+          (click)="togglePasswordVisibility()">
         </ion-icon>
 
       </div>
@@ -79,7 +79,7 @@
     </div>
 
     <!-- GOOGLE -->
-    <button class="btn-google">
+    <button class="btn-google" (click)="loginWithGoogle()">
 
       <img
         src="https://www.svgrepo.com/show/475656/google-color.svg"
