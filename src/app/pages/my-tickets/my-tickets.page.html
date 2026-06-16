@@ -60,9 +60,17 @@
     </button>
   </div>
 
+  <!-- LOADING STATE -->
+  <div class="loading-state animate-fade-in" *ngIf="isLoading">
+    <div class="spinner-wrapper">
+      <div class="main-spinner"></div>
+    </div>
+    <p>Loading your tickets...</p>
+  </div>
+
   <!-- TICKET LIST -->
 
-  <div class="ticket-list">
+  <div class="ticket-list" *ngIf="!isLoading">
 
     <div
       class="ticket-card"
@@ -133,7 +141,7 @@
       <div class="bottom-section">
 
         <div class="status-area">
-          <span class="status-badge" [ngClass]="ticket.status.toLowerCase()">
+          <span class="status-badge" [ngClass]="ticket.status.toLowerCase().split(' ').join('-')">
             {{ ticket.status }}
           </span>
           <span class="status-subtext" *ngIf="ticket.status === 'Canceled'">Payment Expired</span>

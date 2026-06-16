@@ -10,7 +10,7 @@ import {
   checkmarkCircle,
   chevronForwardOutline
 } from 'ionicons/icons';
-import { EventService } from '../../services/event.service';
+import { EventService, EventItem } from '../../services/event.service';
 import { ProfileService } from '../../services/profile.service';
 
 @Component({
@@ -33,6 +33,8 @@ export class CertificatesPage implements OnInit, OnDestroy {
   userName = '';
   certificates: any[] = [];
   private profileSubscription!: Subscription;
+  private eventsSubscription!: Subscription;
+  private allEvents: EventItem[] = [];
 
   constructor() {
     addIcons({
@@ -48,11 +50,24 @@ export class CertificatesPage implements OnInit, OnDestroy {
       this.userName = profile.fullName;
       this.loadCertificates();
     });
+
+    this.eventsSubscription = this.eventService.getEvents(true).subscribe({
+      next: (events) => {
+        this.allEvents = events;
+        this.loadCertificates();
+      },
+      error: (err) => {
+        console.error('Error loading events in Certificates:', err);
+      }
+    });
   }
 
   ngOnDestroy() {
     if (this.profileSubscription) {
       this.profileSubscription.unsubscribe();
+    }
+    if (this.eventsSubscription) {
+      this.eventsSubscription.unsubscribe();
     }
   }
 
@@ -95,7 +110,7 @@ export class CertificatesPage implements OnInit, OnDestroy {
 
     // Map to Certificate Items
     this.certificates = completedBookings.map((b: any) => {
-      const event = this.eventService.getEventById(b.eventType) || {
+      const event = this.allEvents.find((e: any) => e.id === b.eventType) || {
         title: b.eventType === 'seminar' ? 'Digital Business Seminar 2026' : 'Hindia Pop Music Concert',
         date: b.eventType === 'seminar' ? '15 Juni • 09.00' : '28 Mei • 19.00',
         location: b.eventType === 'seminar' ? 'Bandung' : 'Jakarta',

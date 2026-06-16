@@ -1,5 +1,7 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { inject, Injectable } from '@angular/core';
+import { BehaviorSubject, Observable, map } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 export interface UserProfile {
   fullName: string;
@@ -13,6 +15,7 @@ export interface UserProfile {
   providedIn: 'root'
 })
 export class ProfileService {
+  private http = inject(HttpClient);
   private readonly STORAGE_KEY = 'joyvent_user_profile';
 
   private readonly defaultProfile: UserProfile = {
@@ -27,6 +30,24 @@ export class ProfileService {
   profile$: Observable<UserProfile> = this.profileSubject.asObservable();
 
   constructor() {}
+
+  fetchProfile(): Observable<UserProfile> {
+    return this.http.get<any>(`${environment.apiUrl}/user`).pipe(
+      map(user => {
+        const profile: UserProfile = {
+          fullName: user.name,
+          email: user.email,
+          phone: user.phone || '',
+          location: '',
+          avatar: user.profile_photo || ''
+        };
+        localStorage.setItem('joyvent_active_email', user.email);
+        localStorage.setItem(`joyvent_user_profile_${user.email}`, JSON.stringify(profile));
+        this.profileSubject.next(profile);
+        return profile;
+      })
+    );
+  }
 
   private loadProfileFromStorage(): UserProfile {
     const activeEmail = localStorage.getItem('joyvent_active_email');

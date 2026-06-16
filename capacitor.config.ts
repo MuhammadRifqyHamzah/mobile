@@ -8,7 +8,7 @@ const config: CapacitorConfig = {
     androidScheme: 'http',
     cleartext: true,
     allowNavigation: [
-      '192.168.1.5:8000'
+      'project26dev.my.id'
     ]
   },
   plugins: {

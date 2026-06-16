@@ -15,26 +15,27 @@
     <h1>Instruksi Bayar</h1>
   </div>
 
-  <!-- COUNTDOWN CARD -->
-  <div class="countdown-card">
-    <div class="countdown-details">
-      <p>Selesaikan pembayaran dalam waktu</p>
-      <h2 [class.warning]="isWarning" [class.blink]="isBlinking" [class.expired]="isExpired">
-        <span class="time-part">{{ minutes < 10 ? '0' + minutes : minutes }}</span>
-        <span class="colon">:</span>
-        <span class="time-part">{{ seconds < 10 ? '0' + seconds : seconds }}</span>
-      </h2>
+  <!-- PAYMENT SUMMARY CARD -->
+  <div class="payment-summary-card">
+    <div class="summary-row">
+      <span class="label">Status Pembayaran</span>
+      <strong class="value" [class]="(paymentStatus || '').toLowerCase()">
+        {{ paymentStatus === 'paid' ? 'Paid' : (paymentStatus === 'failed' ? 'Failed' : 'Pending') }}
+      </strong>
     </div>
-    <div class="countdown-icon">
-      <ion-icon name="time-outline"></ion-icon>
+    <div class="summary-row">
+      <span class="label">Sisa Waktu Pembayaran</span>
+      <strong class="value countdown" [class.warning]="isWarning" [class.blink]="isBlinking" [class.expired]="isExpired">
+        {{ hours < 10 ? '0' + hours : hours }}:{{ minutes < 10 ? '0' + minutes : minutes }}:{{ seconds < 10 ? '0' + seconds : seconds }}
+      </strong>
     </div>
-  </div>
-
-  <!-- TOTAL CARD -->
-  <div class="payment-total-card">
-    <div class="total-info">
-      <span>Total Pembayaran</span>
-      <h2>Rp{{ totalPrice.toLocaleString('id-ID') }}</h2>
+    <div class="summary-row">
+      <span class="label">Nominal Pembayaran</span>
+      <strong class="value">Rp{{ paymentAmount.toLocaleString('id-ID') }}</strong>
+    </div>
+    <div class="summary-row">
+      <span class="label">Metode Pembayaran</span>
+      <strong class="value">{{ paymentMethod }}</strong>
     </div>
   </div>
 
@@ -103,7 +104,7 @@
             <li>Pilih menu <strong>Bayar / Transfer</strong>.</li>
             <li *ngIf="paymentMethod !== 'QRIS'">Masukkan kode Virtual Account / Kode Bayar: <strong>{{ getPaymentCode() }}</strong>.</li>
             <li *ngIf="paymentMethod === 'QRIS'">Scan kode QRIS yang tampil di layar aplikasi JoyVent.</li>
-            <li>Periksa kecocokan nama dan nominal bayar: <strong>Rp{{ totalPrice.toLocaleString('id-ID') }}</strong>.</li>
+            <li>Periksa kecocokan nama dan nominal bayar: <strong>Rp{{ paymentAmount.toLocaleString('id-ID') }}</strong>.</li>
             <li>Masukkan PIN transaksi Anda untuk menyelesaikan pembayaran.</li>
           </ol>
         </div>

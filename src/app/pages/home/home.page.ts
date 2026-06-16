@@ -14,6 +14,7 @@ import {
 } from 'ionicons/icons';
 import { EventService, EventItem } from '../../services/event.service';
 import { ProfileService } from '../../services/profile.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-home',
@@ -32,6 +33,7 @@ export class HomePage implements OnInit, OnDestroy {
   private router = inject(Router);
   private eventService = inject(EventService);
   private profileService = inject(ProfileService);
+  private notificationService = inject(NotificationService);
 
   events: EventItem[] = [];
   userAvatar = '';
@@ -43,6 +45,7 @@ export class HomePage implements OnInit, OnDestroy {
   unreadNotificationsCount = 0;
 
   private profileSubscription!: Subscription;
+  private eventsSubscription!: Subscription;
 
   constructor() {
     addIcons({
@@ -55,7 +58,15 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.events = this.eventService.getEvents();
+    this.eventsSubscription = this.eventService.getEvents().subscribe({
+      next: (events) => {
+        this.events = events;
+      },
+      error: (err) => {
+        console.error('Error loading events:', err);
+      }
+    });
+
     this.profileSubscription = this.profileService.profile$.subscribe(profile => {
       this.userAvatar = profile.avatar;
       this.userName = this.getFirstName(profile.fullName);
@@ -68,23 +79,23 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   loadUnreadCount() {
-    const saved = localStorage.getItem('joyvent_notifications');
-    if (saved) {
-      try {
-        const list = JSON.parse(saved);
-        this.unreadNotificationsCount = list.filter((n: any) => n.unread).length;
-      } catch (e) {
-        console.error('Error parsing notifications for count:', e);
+    this.notificationService.getUnreadCount().subscribe({
+      next: (count) => {
+        this.unreadNotificationsCount = count;
+      },
+      error: (err) => {
+        console.error('Error loading unread count from API:', err);
         this.unreadNotificationsCount = 0;
       }
-    } else {
-      this.unreadNotificationsCount = 2; // Default mock unread count
-    }
+    });
   }
 
   ngOnDestroy() {
     if (this.profileSubscription) {
       this.profileSubscription.unsubscribe();
+    }
+    if (this.eventsSubscription) {
+      this.eventsSubscription.unsubscribe();
     }
   }
 

@@ -46,10 +46,17 @@ export class SavedPage implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.subscription = this.eventService.savedEventIds$.subscribe(savedIds => {
-      const allEvents = this.eventService.getEvents();
-      this.savedEvents = allEvents.filter(event => savedIds.includes(event.id));
-      this.filterEvents();
+    this.subscription = this.eventService.getEvents().subscribe({
+      next: (allEvents) => {
+        const sub = this.eventService.savedEventIds$.subscribe(savedIds => {
+          this.savedEvents = allEvents.filter(event => savedIds.includes(event.id));
+          this.filterEvents();
+        });
+        this.subscription.add(sub);
+      },
+      error: (err) => {
+        console.error('Error fetching events in Saved:', err);
+      }
     });
   }
 

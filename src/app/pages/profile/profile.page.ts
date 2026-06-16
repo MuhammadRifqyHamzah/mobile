@@ -95,6 +95,9 @@ export class ProfilePage implements OnInit, OnDestroy {
 
   ionViewWillEnter() {
     this.calculateStatistics();
+    this.profileService.fetchProfile().subscribe({
+      error: (err) => console.error('Failed to sync profile from server:', err)
+    });
   }
 
   ngOnInit() {
@@ -202,14 +205,27 @@ export class ProfilePage implements OnInit, OnDestroy {
   }
 
   async logout() {
-    this.authService.logout();
-    this.profileService.clearProfile();
-    try {
-      await GoogleAuth.signOut();
-    } catch (e) {
-      console.log('Error signing out from Google:', e);
-    }
-    this.navCtrl.navigateRoot('/login');
+    this.authService.logout().subscribe({
+      next: async () => {
+        this.profileService.clearProfile();
+        try {
+          await GoogleAuth.signOut();
+        } catch (e) {
+          console.log('Error signing out from Google:', e);
+        }
+        this.navCtrl.navigateRoot('/login');
+      },
+      error: async (err) => {
+        console.error('Logout error:', err);
+        this.profileService.clearProfile();
+        try {
+          await GoogleAuth.signOut();
+        } catch (e) {
+          console.log('Error signing out from Google:', e);
+        }
+        this.navCtrl.navigateRoot('/login');
+      }
+    });
   }
 
   onAvatarError() {

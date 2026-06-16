@@ -1,22 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
-
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import { FormsModule } from '@angular/forms';
-
-import {
-  Router,
-  ActivatedRoute
-} from '@angular/router';
-
-import {
-  IonContent,
-  IonIcon,
-  IonRippleEffect
-} from '@ionic/angular/standalone';
-
+import { Router, ActivatedRoute } from '@angular/router';
+import { IonContent, IonIcon, IonRippleEffect } from '@ionic/angular/standalone';
+import { Subscription } from 'rxjs';
 import { addIcons } from 'ionicons';
-
 import {
   arrowBackOutline,
   personOutline,
@@ -26,9 +14,10 @@ import {
   walletOutline,
   qrCodeOutline,
   businessOutline,
-  checkmarkCircle
+  checkmarkCircle,
+  alertCircleOutline,
+  checkmarkCircleOutline
 } from 'ionicons/icons';
-
 import { EventService } from '../../services/event.service';
 
 @Component({
@@ -49,11 +38,10 @@ import { EventService } from '../../services/event.service';
   ],
 })
 
-export class BookingPage implements OnInit {
+export class BookingPage implements OnInit, OnDestroy {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private eventService = inject(EventService);
-
 
   event: any;
   ticketQuantities: { [catId: string]: number } = {};
@@ -61,21 +49,19 @@ export class BookingPage implements OnInit {
   /* =========================
      EVENT DATA
   ========================= */
-
   eventImage = '';
-
   eventTitle = '';
-
   eventLocation = '';
-
   eventDate = '';
-
   eventType = '';
+
+  isLoading = false;
+  errorMessage = '';
+  successMessage = '';
 
   /* =========================
      STEP
   ========================= */
-
   stepsIndex = 0;
 
   getSteps(): number[] {
@@ -92,88 +78,64 @@ export class BookingPage implements OnInit {
   /* =========================
      FORM DATA
   ========================= */
-
   fullName = '';
-
   email = '';
-
   phone = '';
 
   /* =========================
      PRICE
   ========================= */
-
   vipPrice = 300000;
-
   regularPrice = 150000;
 
   /* =========================
      QTY
   ========================= */
-
   vipQty = 0;
-
   regularQty = 0;
 
   /* =========================
      PAYMENT
   ========================= */
-
   selectedPayment = 'Bank Transfer';
 
   /* =========================
-     VIP SEATS
+     SEAT LAYOUT (API SOURCE)
   ========================= */
+  seatLayout: any[] = [];
 
-  vipSeats = this.generateSeats('V', 30, 5);
-
-  /* =========================
-     REGULAR SEATS
-  ========================= */
-
-  regularSeats = this.generateSeats('R', 70, 5);
-
-  /* =========================
-     BOOKED SEATS
-  ========================= */
-
-  bookedSeats = [
-    'V3', 'V9', 'V15', 'V22', 'V28',
-    'R4', 'R8', 'R14', 'R25', 'R33', 'R42', 'R55', 'R62', 'R68'
-  ];
-
-  /* =========================
-     SEAT GENERATION HELPER
-  ========================= */
-
-  generateSeats(prefix: string, total: number, cols: number): string[][] {
-    const seats: string[][] = [];
-    let row: string[] = [];
-    for (let i = 1; i <= total; i++) {
-      row.push(`${prefix}${i}`);
-      if (row.length === cols) {
-        seats.push(row);
-        row = [];
+  loadSeats(eventId: string | number) {
+    this.eventService.getEventSeats(eventId.toString()).subscribe({
+      next: (res) => {
+        this.seatLayout = res.data || [];
+      },
+      error: (err) => {
+        console.error('Failed to load seats from API:', err);
       }
-    }
-    if (row.length > 0) {
-      seats.push(row);
-    }
-    return seats;
+    });
+  }
+
+  getMaxY(): number {
+    if (!this.seatLayout || this.seatLayout.length === 0) return 300;
+    return Math.max(...this.seatLayout.map(s => s.y || 0));
+  }
+
+  getMaxX(): number {
+    if (!this.seatLayout || this.seatLayout.length === 0) return 300;
+    return Math.max(...this.seatLayout.map(s => s.x || 0));
   }
 
   /* =========================
      SELECTED SEATS
   ========================= */
-
   selectedSeats: string[] = [];
+
+  private eventSubscription!: Subscription;
 
   /* =========================
      CONSTRUCTOR
   ========================= */
-
   constructor() {
-
     addIcons({
       arrowBackOutline,
       personOutline,
@@ -183,67 +145,95 @@ export class BookingPage implements OnInit {
       walletOutline,
       qrCodeOutline,
       businessOutline,
-      checkmarkCircle
+      checkmarkCircle,
+      alertCircleOutline,
+      checkmarkCircleOutline
     });
-
   }
 
   /* =========================
      ON INIT
   ========================= */
-
   ngOnInit() {
-
     this.route.queryParams.subscribe(params => {
-
       const type = params['type'] || 'concert';
-
       this.eventType = type;
 
-      const event = this.eventService.getEventById(type);
-      this.event = event;
-      if (event) {
-        // Redirection check for sold out event
-        const total = event.ticketCategories.reduce((sum, cat) => sum + cat.total, 0);
-        const sold = event.ticketCategories.reduce((sum, cat) => sum + cat.sold, 0);
-        if (total - sold === 0) {
-          alert('This event is sold out. Booking is not available.');
-          this.router.navigate(['/detail-event'], { queryParams: { type: this.eventType } });
-          return;
+      if (this.eventSubscription) {
+        this.eventSubscription.unsubscribe();
+      }
+
+      this.eventSubscription = this.eventService.getEventById(type).subscribe({
+        next: (event) => {
+          this.event = event;
+          if (event) {
+            this.loadSeats(event.id);
+            // Redirection check for sold out event
+            const total = event.ticketCategories.reduce((sum: number, cat: any) => sum + cat.total, 0);
+            const sold = event.ticketCategories.reduce((sum: number, cat: any) => sum + cat.sold, 0);
+            if (total - sold === 0) {
+              alert('This event is sold out. Booking is not available.');
+              this.router.navigate(['/detail-event'], { queryParams: { type: this.eventType } });
+              return;
+            }
+
+            this.eventImage = event.image;
+            this.eventTitle = event.title;
+            this.eventLocation = event.location === 'Jakarta' ? 'Jakarta International Expo' : event.location;
+            
+            const parts = event.date.split('•');
+            const datePart = parts[0]?.trim() || '';
+            const timePart = parts[1]?.trim() || '';
+            this.eventDate = `${datePart} 2026 • ${timePart} WIB`;
+
+            this.ticketQuantities = {};
+            event.ticketCategories.forEach(cat => {
+              this.ticketQuantities[cat.id] = 0;
+            });
+          } else {
+            this.loadFallbackEvent();
+          }
+          this.syncLegacyQuantities();
+        },
+        error: (err) => {
+          console.error('Error loading event in Booking:', err);
+          this.loadFallbackEvent();
+          this.syncLegacyQuantities();
         }
+      });
+    });
+  }
 
-        this.eventImage = event.image;
-        this.eventTitle = event.title;
-        this.eventLocation = event.location === 'Jakarta' ? 'Jakarta International Expo' : event.location;
-        
-        const parts = event.date.split('•');
-        const datePart = parts[0]?.trim() || '';
-        const timePart = parts[1]?.trim() || '';
-        this.eventDate = `${datePart} 2026 • ${timePart} WIB`;
+  ngOnDestroy() {
+    if (this.eventSubscription) {
+      this.eventSubscription.unsubscribe();
+    }
+  }
 
-        this.ticketQuantities = {};
-        event.ticketCategories.forEach(cat => {
-          this.ticketQuantities[cat.id] = 0;
-        });
-      } else {
-        const fallback = this.eventService.getEventById('concert');
+  private loadFallbackEvent() {
+    this.eventSubscription = this.eventService.getEventById('concert').subscribe({
+      next: (fallback) => {
         this.event = fallback;
         if (fallback) {
+          this.loadSeats(fallback.id);
           this.eventType = 'concert';
           this.eventImage = fallback.image;
           this.eventTitle = fallback.title;
           this.eventLocation = 'Jakarta International Expo';
-          this.eventDate = '28 Mei 2026 • 19.00 WIB';
+          
+          const parts = fallback.date.split('•');
+          const datePart = parts[0]?.trim() || '';
+          const timePart = parts[1]?.trim() || '';
+          this.eventDate = `${datePart} 2026 • ${timePart} WIB`;
+
           this.ticketQuantities = {};
           fallback.ticketCategories.forEach(cat => {
             this.ticketQuantities[cat.id] = 0;
           });
+          this.syncLegacyQuantities();
         }
       }
-      this.syncLegacyQuantities();
-
     });
-
   }
 
   /* =========================
@@ -508,87 +498,53 @@ export class BookingPage implements OnInit {
      TOGGLE SEAT
   ========================= */
 
-  toggleSeat(seat: string) {
-
-    /* BOOKED */
-
-    if (this.bookedSeats.includes(seat)) {
-
+  toggleSeat(seat: any) {
+    if (seat.status === 'booked') {
       return;
-
     }
 
-    const index =
-      this.selectedSeats.indexOf(seat);
+    const index = this.selectedSeats.indexOf(seat.seat_number);
 
     /* UNSELECT */
-
     if (index > -1) {
-
       this.selectedSeats.splice(index, 1);
-
       return;
-
     }
 
-    /* VIP LIMIT */
+    /* LIMIT BY CATEGORY QTY */
+    const catId = seat.ticket_category_id;
+    const maxQty = this.ticketQuantities[catId] || 0;
+    
+    // Count how many seats of this ticket category are already selected
+    const selectedCount = this.selectedSeats.filter(seatNum => {
+      const s = this.seatLayout.find(item => item.seat_number === seatNum);
+      return s && s.ticket_category_id === catId;
+    }).length;
 
-    if (seat.startsWith('V')) {
-
-      const vipSelected =
-        this.selectedSeats.filter(
-          s => s.startsWith('V')
-        ).length;
-
-      if (vipSelected >= this.vipQty) {
-
-        return;
-
-      }
-
-    }
-
-    /* REGULAR LIMIT */
-
-    if (seat.startsWith('R')) {
-
-      const regularSelected =
-        this.selectedSeats.filter(
-          s => s.startsWith('R')
-        ).length;
-
-      if (regularSelected >= this.regularQty) {
-
-        return;
-
-      }
-
+    if (selectedCount >= maxQty) {
+      alert(`Anda telah memilih batas maksimum kursi (${maxQty}) untuk kategori tiket ini.`);
+      return;
     }
 
     /* SELECT */
-
-    this.selectedSeats.push(seat);
-
+    this.selectedSeats.push(seat.seat_number);
   }
 
   /* =========================
      IS SELECTED
   ========================= */
 
-  isSelected(seat: string): boolean {
-
-    return this.selectedSeats.includes(seat);
-
+  isSelected(seatNumber: string): boolean {
+    return this.selectedSeats.includes(seatNumber);
   }
 
   /* =========================
      IS BOOKED
   ========================= */
 
-  isBooked(seat: string): boolean {
-
-    return this.bookedSeats.includes(seat);
-
+  isBooked(seatNumber: string): boolean {
+    const seat = this.seatLayout.find(s => s.seat_number === seatNumber);
+    return seat ? seat.status === 'booked' : false;
   }
 
   /* =========================
@@ -596,44 +552,86 @@ export class BookingPage implements OnInit {
   ========================= */
 
   goToPaymentInstruction() {
-    const expiredAt = Date.now() + 10 * 60 * 1000; // 10 minutes in ms
-    const bookingId = 'BK-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
-
-    const bookingData = {
-      bookingId: bookingId,
-      fullName: this.fullName,
-      vipQty: this.vipQty,
-      regularQty: this.regularQty,
-      ticketQuantities: this.ticketQuantities,
-      selectedSeats: this.selectedSeats,
-      totalPrice: this.getTotalPrice(),
-      paymentMethod: this.selectedPayment,
-      eventType: this.eventType,
-      paymentExpiredAt: expiredAt,
-      status: 'Unpaid'
-    };
-
-    localStorage.setItem('latest_booking', JSON.stringify(bookingData));
-
-    const historyStr = localStorage.getItem('booking_history') || '[]';
-    try {
-      const history = JSON.parse(historyStr);
-      history.push(bookingData);
-      localStorage.setItem('booking_history', JSON.stringify(history));
-    } catch (e) {
-      console.error(e);
-    }
-
-    this.router.navigate(
-      ['/payment-instruction'],
-      {
-        queryParams: {
-          type: this.eventType
-        },
-        state: bookingData
-      }
+    // 1. Validasi
+    const selectedCategoryId = Object.keys(this.ticketQuantities).find(
+      (catId) => this.ticketQuantities[catId] > 0
     );
 
+    if (!selectedCategoryId) {
+      alert('Please select a ticket category.');
+      return;
+    }
+
+    if (!this.fullName || !this.email || !this.phone) {
+      alert('Please complete your contact details first.');
+      return;
+    }
+
+    let selectedSeatId: number | undefined;
+    let selectedSeatNumber: string | undefined;
+
+    if (this.event && this.event.hasSeatSelection && this.selectedSeats.length > 0) {
+      selectedSeatNumber = this.selectedSeats[0];
+      const seatObj = this.seatLayout.find(s => s.seat_number === selectedSeatNumber);
+      if (seatObj) {
+        selectedSeatId = seatObj.id;
+      }
+    }
+
+    this.eventService.createRegistration(this.event.id, selectedCategoryId, selectedSeatId, selectedSeatNumber).subscribe({
+      next: (res) => {
+        this.isLoading = false;
+        this.successMessage = 'Registration created successfully!';
+        
+        // Refresh seats data from API (Revision 2)
+        if (this.event) {
+          this.loadSeats(this.event.id);
+        }
+        
+        // Simpan registration_id ke localStorage
+        if (res && res.data && res.data.id) {
+          localStorage.setItem('latest_registration_id', res.data.id.toString());
+        }
+
+        // Construct bookingData matching what ticket-success expects (without local storage write in booking.page)
+        const bookingData = {
+          bookingId: res?.data?.registration_code || ('BK-' + Date.now()),
+          registrationId: res?.data?.id,
+          fullName: this.fullName,
+          vipQty: this.vipQty,
+          regularQty: this.regularQty,
+          ticketQuantities: this.ticketQuantities,
+          selectedSeats: this.selectedSeats,
+          totalPrice: this.getTotalPrice(),
+          paymentMethod: this.selectedPayment,
+          payment_method: this.selectedPayment,
+          eventType: this.eventType
+        };
+
+        // Navigasi langsung ke Payment Instruction
+        this.router.navigate(
+          ['/payment-instruction'],
+          {
+            queryParams: {
+              type: this.eventType
+            },
+            state: bookingData
+          }
+        );
+      },
+      error: (err) => {
+        this.isLoading = false;
+        console.error('Registration failed:', err);
+        // Tampilkan pesan error backend jika request gagal
+        if (err && err.error && err.error.message) {
+          this.errorMessage = err.error.message;
+        } else if (err && err.message) {
+          this.errorMessage = err.message;
+        } else {
+          this.errorMessage = 'Terjadi kesalahan saat melakukan registrasi. Silakan coba lagi.';
+        }
+      }
+    });
   }
 
   /* =========================
@@ -649,6 +647,7 @@ export class BookingPage implements OnInit {
       selectedSeats: this.selectedSeats,
       totalPrice: this.getTotalPrice(),
       paymentMethod: this.selectedPayment,
+      payment_method: this.selectedPayment,
       eventType: this.eventType
     };
     localStorage.setItem('latest_booking', JSON.stringify(bookingData));

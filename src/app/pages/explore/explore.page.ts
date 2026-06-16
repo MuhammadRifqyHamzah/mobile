@@ -48,6 +48,7 @@ export class ExplorePage implements OnInit, OnDestroy {
 
   savedEventIds: string[] = [];
   private savedSubscription!: Subscription;
+  private eventsSubscription!: Subscription;
 
   constructor() {
     addIcons({
@@ -63,19 +64,28 @@ export class ExplorePage implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.events = this.eventService.getEvents();
+    this.eventsSubscription = this.eventService.getEvents().subscribe({
+      next: (events) => {
+        this.events = events;
+        this.filterAndSortEvents();
+      },
+      error: (err) => {
+        console.error('Error loading events in Explore:', err);
+      }
+    });
     
     // Subscribe to saved events to sync state instantly
     this.savedSubscription = this.eventService.savedEventIds$.subscribe(ids => {
       this.savedEventIds = ids;
     });
-
-    this.filterAndSortEvents();
   }
 
   ngOnDestroy() {
     if (this.savedSubscription) {
       this.savedSubscription.unsubscribe();
+    }
+    if (this.eventsSubscription) {
+      this.eventsSubscription.unsubscribe();
     }
   }
 

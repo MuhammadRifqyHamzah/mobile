@@ -162,41 +162,23 @@
     </div>
 
     <!-- SEAT LAYOUT -->
-    <div class="seat-layout">
-      <!-- VIP -->
-      <div class="seat-section">
-        <h3>VIP SECTION</h3>
-        <div
-          class="seat-row"
-          *ngFor="let row of vipSeats">
-          <button
-            *ngFor="let seat of row"
-            class="seat-btn"
-            [class.selected]="isSelected(seat)"
-            [class.booked]="isBooked(seat)"
-            [disabled]="isBooked(seat)"
-            (click)="toggleSeat(seat)">
-            {{ seat }}
-          </button>
-        </div>
-      </div>
-
-      <!-- REGULAR -->
-      <div class="seat-section">
-        <h3>REGULAR SECTION</h3>
-        <div
-          class="seat-row"
-          *ngFor="let row of regularSeats">
-          <button
-            *ngFor="let seat of row"
-            class="seat-btn"
-            [class.selected]="isSelected(seat)"
-            [class.booked]="isBooked(seat)"
-            [disabled]="isBooked(seat)"
-            (click)="toggleSeat(seat)">
-            {{ seat }}
-          </button>
-        </div>
+    <div class="visual-seat-wrapper">
+      <div class="visual-seat-container" [style.height.px]="getMaxY() + 60" [style.min-width.px]="getMaxX() + 60">
+        <button
+          *ngFor="let seat of seatLayout"
+          class="seat-btn visual-seat"
+          [class.selected]="isSelected(seat.seat_number)"
+          [class.booked]="seat.status === 'booked'"
+          [class.category-vip]="seat.category === 'VIP' || seat.category === 'VVIP'"
+          [class.category-platinum]="seat.category === 'Platinum'"
+          [class.category-silver]="seat.category === 'Silver' || seat.category === 'Regular' || seat.category === 'Reguler'"
+          [disabled]="seat.status === 'booked'"
+          [style.left.px]="seat.x"
+          [style.top.px]="seat.y"
+          [style.transform]="'rotate(' + seat.rotation + 'deg)'"
+          (click)="toggleSeat(seat)">
+          {{ seat.seat_number }}
+        </button>
       </div>
     </div>
 
@@ -344,19 +326,36 @@
       </div>
     </div>
 
+    <!-- FEEDBACK MESSAGES -->
+    <div *ngIf="errorMessage" class="error-message-box animate-fade">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <div *ngIf="successMessage" class="success-message-box animate-fade">
+      <ion-icon name="checkmark-circle-outline"></ion-icon>
+      <span>{{ successMessage }}</span>
+    </div>
+
     <!-- BUTTONS -->
     <div class="step-button-group">
       <button
         class="secondary-btn ion-activatable ripple-parent"
+        [disabled]="isLoading"
         (click)="prevStep()">
         Back
-        <ion-ripple-effect></ion-ripple-effect>
+        <ion-ripple-effect *ngIf="!isLoading"></ion-ripple-effect>
       </button>
       <button
         class="next-btn primary-btn ion-activatable ripple-parent"
+        [disabled]="isLoading"
         (click)="goToPaymentInstruction()">
-        Confirm
-        <ion-ripple-effect></ion-ripple-effect>
+        <span *ngIf="!isLoading">Confirm</span>
+        <span *ngIf="isLoading" class="loading-btn-content">
+          <span class="spinner"></span>
+          Processing...
+        </span>
+        <ion-ripple-effect *ngIf="!isLoading"></ion-ripple-effect>
       </button>
     </div>
   </div>

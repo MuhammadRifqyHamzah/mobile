@@ -96,24 +96,59 @@
         <h2>Rp{{ totalPrice.toLocaleString('id-ID') }}</h2>
       </div>
 
+      <!-- PAYMENT INFORMATION CARD -->
+      <div class="payment-info-card">
+        <h3>Payment Information</h3>
+        <div class="payment-detail-line">
+          <span>Status Pembayaran</span>
+          <strong [class]="(paymentStatus || '').toLowerCase()">
+            {{ paymentStatus === 'paid' ? 'Paid' : (paymentStatus === 'failed' ? 'Failed' : 'Pending') }}
+          </strong>
+        </div>
+        <div class="payment-detail-line">
+          <span>Nominal Pembayaran</span>
+          <strong>Rp{{ paymentAmount.toLocaleString('id-ID') }}</strong>
+        </div>
+        <div class="payment-detail-line">
+          <span>Metode Pembayaran</span>
+          <strong>{{ paymentMethod }}</strong>
+        </div>
+        <div class="payment-detail-line" *ngIf="paidAt">
+          <span>Dibayar Pada</span>
+          <strong>{{ paidAt | date:'dd MMMM yyyy, HH:mm' }} WIB</strong>
+        </div>
+        <div class="payment-detail-line" *ngIf="paymentStatus === 'pending' && paymentExpiredAt">
+          <span>Batas Pembayaran</span>
+          <strong>{{ paymentExpiredAt | date:'dd MMMM yyyy, HH:mm' }} WIB</strong>
+        </div>
+      </div>
+
       <!-- QR SECTION -->
       <div class="qr-section">
         <div class="qr-wrapper">
+          <!-- Render dynamic QR from qr_code value if available -->
           <img
-            src="assets/images/qr-code.png"
+            *ngIf="qrCode"
+            [src]="'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + qrCode"
             alt="qr"
-            [class.blurred]="status === 'Refund Requested' || status === 'Refunded'"
+            [class.blurred]="status === 'Refund In Process' || status === 'Refunded'"
           >
+          
+          <!-- Fallback UI if qr_code is empty -->
+          <div *ngIf="!qrCode" class="qr-fallback-container">
+            <ion-icon name="alert-circle-outline"></ion-icon>
+            <p>QR Code Belum Tersedia</p>
+          </div>
           
           <!-- BLUR OVERLAY FOR QR IF REFUNDED / REFUND IN PROGRESS -->
           <div 
             class="qr-blur-overlay" 
-            *ngIf="status === 'Refund Requested' || status === 'Refunded'"
-            [ngClass]="status.toLowerCase().replace(' ', '-')"
+            *ngIf="status === 'Refund In Process' || status === 'Refunded'"
+            [ngClass]="status.toLowerCase().split(' ').join('-')"
           >
-            <ion-icon name="time-outline" *ngIf="status === 'Refund Requested'"></ion-icon>
+            <ion-icon name="time-outline" *ngIf="status === 'Refund In Process'"></ion-icon>
             <ion-icon name="lock-closed-outline" *ngIf="status === 'Refunded'"></ion-icon>
-            <span>{{ status === 'Refund Requested' ? 'Refund In Process' : 'Refunded' }}</span>
+            <span>{{ status === 'Refund In Process' ? 'Refund In Process' : 'Refunded' }}</span>
           </div>
         </div>
 
@@ -139,7 +174,7 @@
       </div>
 
       <!-- REFUND TIMELINE -->
-      <div class="refund-timeline-card" *ngIf="status === 'Refund Requested' || status === 'Refunded'">
+      <div class="refund-timeline-card" *ngIf="status === 'Refund In Process' || status === 'Refunded' || status === 'Refund Rejected'">
         <h4>Refund Timeline</h4>
         <div class="timeline-steps">
           <div class="timeline-step active">
@@ -153,37 +188,33 @@
             </div>
           </div>
           
-          <div class="timeline-connector" [class.active]="status === 'Refunded'"></div>
+          <div class="timeline-connector" [class.active]="status === 'Refunded' || status === 'Refund Rejected'"></div>
           
-          <div class="timeline-step" [class.active]="status === 'Refunded'">
+          <div class="timeline-step" [class.active]="status === 'Refunded' || status === 'Refund Rejected'">
             <div class="step-icon-wrapper">
               <ion-icon name="checkmark-circle" *ngIf="status === 'Refunded'"></ion-icon>
-              <div class="step-dot" *ngIf="status !== 'Refunded'"></div>
+              <ion-icon name="close-circle" *ngIf="status === 'Refund Rejected'" style="color: #ef4444"></ion-icon>
+              <div class="step-dot" *ngIf="status === 'Refund In Process'"></div >
             </div>
             <div class="step-details">
-              <h5>{{ status === 'Refunded' ? 'Refunded (Approved)' : 'Processing Refund' }}</h5>
+              <h5 *ngIf="status === 'Refund In Process'">Processing Refund</h5>
+              <h5 *ngIf="status === 'Refunded'">Refunded (Approved)</h5>
+              <h5 *ngIf="status === 'Refund Rejected'">Refund Rejected</h5>
+              
+              <p *ngIf="status === 'Refund In Process'">Organizer is verifying your request.</p>
               <p *ngIf="status === 'Refunded'">Refund has been credited back to your payment method.</p>
-              <p *ngIf="status !== 'Refunded'">Organizer is verifying your request.</p>
+              <p *ngIf="status === 'Refund Rejected'">Organizer has rejected your request.</p>
+              
+              <p class="timeline-date" *ngIf="(status === 'Refunded' || status === 'Refund Rejected') && refundUpdatedAt > 0" style="margin: 4px 0 0; font-size: 11.5px; color: #64748b; font-weight: 600;">
+                {{ refundUpdatedAt | date:'dd MMM yyyy, HH:mm' }} WIB
+              </p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ADMIN SIMULATION PANEL -->
-      <div class="admin-sim-panel" *ngIf="status === 'Refund Requested'">
-        <div class="panel-header">
-          <ion-icon name="construct-outline"></ion-icon>
-          <span>Admin Simulation Mode</span>
-        </div>
-        <p>Simulate organizer verifying and approving this refund request:</p>
-        <button class="approve-refund-btn ion-activatable ripple-parent" (click)="simulateApproveRefund()">
-          <span>Approve & Issue Refund</span>
-          <ion-ripple-effect></ion-ripple-effect>
-        </button>
-      </div>
-
       <!-- STATUS BADGE -->
-      <div class="status-badge" [ngClass]="status.toLowerCase().replace(' ', '-')">
+      <div class="status-badge" [ngClass]="status.toLowerCase().split(' ').join('-')">
         {{ status }}
       </div>
 
@@ -264,7 +295,7 @@
       </div>
       
       <!-- INVALID STATE (Refund Requested or Refunded) -->
-      <div class="scanner-result invalid-state" *ngIf="status === 'Refund Requested' || status === 'Refunded'">
+      <div class="scanner-result invalid-state" *ngIf="status === 'Refund In Process' || status === 'Refunded'">
         <div class="result-icon-wrapper error-icon">
           <ion-icon name="close-circle-outline"></ion-icon>
         </div>
@@ -274,7 +305,7 @@
         <p class="error-msg">
           This ticket has been cancelled due to a refund request. Check-in is blocked.
         </p>
-
+ 
         <div class="result-details-card error-details">
           <div class="detail-line"><span>Status</span><strong>{{ status }}</strong></div>
           <div class="detail-line" *ngIf="refundReason"><span>Reason</span><strong>{{ refundReason }}</strong></div>
